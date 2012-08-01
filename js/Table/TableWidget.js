@@ -121,9 +121,7 @@ TableWidget.prototype = {
 		}
 		for (var i = 0; i < objects.length; i++) {
 			for (var j = 0; j < objects[i].length; j++) {
-				for (var k = 0; k < objects[i][j].length; k++) {
-					this.tableHash[j][objects[i][j][k].index].highlighted = true;
-				}
+				this.tableHash[i][objects[i][j].index].highlighted = true;
 			}
 		}
 		this.tables[this.activeTable].update();
