@@ -27,8 +27,8 @@ a){var b=F.exec(a);b&&(b[1]=(b[1]||"").toLowerCase(),b[3]=b[3]&&new RegExp("(?:^
  * basic code which is included first for the minified version
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  */
 
 var arrayIndex = function(array, obj) {
@@ -1003,8 +1003,8 @@ if (!document.createElement('canvas').getContext) {
  * basic code which is included in front of simile ajax code for the minified version
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  */
 
 SimileAjax_urlPrefix = GeoTemCoMinifier_urlPrefix + 'lib/simile/ajax/';
@@ -4483,8 +4483,8 @@ SimileAjax.WindowManager._findDropTarget = function(elmt) {
  * basic code which is included in front of timeline code for the minified version
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  */
 
 Timeline_urlPrefix = GeoTemCoMinifier_urlPrefix + 'lib/simile/timeline/';
@@ -10978,8 +10978,8 @@ Timeline.GregorianDateLabeller.dayNames["en"] = [
  * basic code which is included in front of timeplot code for the minified version
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  */
 
 if ( typeof window.Timeplot == "undefined") {
@@ -14557,8 +14557,8 @@ Timer.prototype.setPauseTime = function (nPauseTime) {
  * Modified (overwritten) Simile Timeplot Functions
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  */
 SimileAjax.DateTime.MILLISECOND = 0;
 SimileAjax.DateTime.SECOND = 1;
@@ -17078,8 +17078,8 @@ LegendURL:function(a,b){b.legend={};b.legend.href=a.getAttribute("xlink:href");b
  * GeoTemCo tooltips definition file
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  */
 var Tooltips = {
 	"en" : {
@@ -17284,8 +17284,8 @@ var Tooltips = {
  * Global GeoTemCo Configuration File
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  */
 
 var GeoTemConfig = {
@@ -17674,8 +17674,8 @@ GeoTemConfig.loadKml = function(kml) {
  * Generic map control interface
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  */
 function MapControl(map, button, label, onActivate, onDeactivate) {
 
@@ -17768,8 +17768,8 @@ function MapControl(map, button, label, onActivate, onDeactivate) {
  * circle object aggregate for the map
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  *
  * @param {float} x the x (longitude) value for the circle
  * @param {float} y the y (latitude) value for the circle
@@ -17857,8 +17857,8 @@ CircleObject.prototype = {
  * Implementation for FilterBar Object
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  *
  * @param {Object} parent parent to call filter functions
  * @param {HTML object} parentDiv div to append filter buttons
@@ -17936,8 +17936,8 @@ function FilterBar(parent, parentDiv) {
  * Selection Class
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  *
  * @param {Array} objects array of selected objects
  * @param {Object} widget which belongs to selection
@@ -18006,8 +18006,8 @@ function Selection(objects, widget) {
  * place labels computation for circles
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  */
 function PlacenameTags(circle, map) {
 
@@ -18628,8 +18628,8 @@ function PackPlacenameTags(circle, map) {
  * Map Configuration File
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  */
 function MapConfig(options) {
 
@@ -18701,7 +18701,7 @@ function MapConfig(options) {
 		mapSelectionTools : true, // show/hide map selector tools
 		dataInformation : true, // show/hide data information
 		overlayVisibility : false, // initial visibility of additional overlays
-		proxyHost : ''	//required for selectCountry polygon, if the geoserver is not on the same server like GeoTemCo
+		proxyHost : ''	//required for selectCountry feature, if the requested GeoServer and GeoTemCo are NOT on the same server
 
 	};
 	if ( typeof options != 'undefined') {
@@ -18735,8 +18735,8 @@ function MapConfig(options) {
  * Map GUI Implementation
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  *
  * @param {MapWidget} parent map widget object
  * @param {HTML object} div parent div to append the map gui
@@ -19078,8 +19078,8 @@ function MapGui(map, div, options) {
  * MapWidget Implementation
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  *
  * @param {MapWrapper} core wrapper for interaction to other widgets
  * @param {HTML object} div parent div to append the map widget div
@@ -20490,8 +20490,8 @@ MapWidget.prototype = {
  * Time Configuration File
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  */
 function TimeConfig(options) {
 
@@ -20544,8 +20544,8 @@ function TimeConfig(options) {
  * Time GUI Implementation
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  *
  * @param {TimeWidget} parent time widget object
  * @param {HTML object} div parent div to append the time gui
@@ -20839,8 +20839,8 @@ function TimeGui(plot, div, options) {
  * TableWidget Implementation
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  *
  * @param {TimeWrapper} core wrapper for interaction to other widgets
  * @param {HTML object} div parent div to append the time widget div
@@ -22123,8 +22123,8 @@ TimeWidget.prototype = {
  * Table Configuration File
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  */
 function TableConfig(options) {
 
@@ -22138,7 +22138,7 @@ function TableConfig(options) {
 		tableSelectPage : true, // selection of complete table pages
 		tableSelectAll : false, // selection of complete tables
 		tableShowSelected : true, // show selected objects only option
-		unselectedCellColor : '#EEE'	// color for an unselected row/tab
+		unselectedCellColor : '#EEE' // color for an unselected row/tab
 	};
 	if ( typeof options != 'undefined') {
 		$.extend(this.options, options);
@@ -22171,8 +22171,8 @@ function TableConfig(options) {
  * Table GUI Implementation
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  *
  * @param {TableWidget} parent table widget object
  * @param {HTML object} div parent div to append the table gui
@@ -22224,8 +22224,8 @@ function TableGui(table, div, options) {
  * TableWidget Implementation
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  *
  * @param {TableWrapper} core wrapper for interaction to other widgets
  * @param {HTML object} div parent div to append the table widget div
@@ -22321,9 +22321,7 @@ TableWidget.prototype = {
 		}
 		for (var i = 0; i < objects.length; i++) {
 			for (var j = 0; j < objects[i].length; j++) {
-				for (var k = 0; k < objects[i][j].length; k++) {
-					this.tableHash[j][objects[i][j][k].index].highlighted = true;
-				}
+				this.tableHash[i][objects[i][j].index].highlighted = true;
 			}
 		}
 		this.tables[this.activeTable].update();
@@ -22451,8 +22449,8 @@ TableWidget.prototype = {
  * Implementation for a single table
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  *
  * @param {Array} elements list of data items
  * @param {HTML object} parent div to append the table
@@ -23026,8 +23024,8 @@ function TableElement(object) {
  * GeoTemCo's data object class
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  *
  * @param {String} name name of the data object
  * @param {String} description description of the data object
@@ -23132,8 +23130,8 @@ function DataObject(name, description, locations, dates, weight, tableContent) {
  * GeoTemCo's Dataset class
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  *
  * @param {Array} objects data item arrays from different datasets
  * @param {String} label label for the datasets
@@ -23170,8 +23168,8 @@ function Dataset(objects, label) {
  * implementation for aggregation of time items
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  *
  * @param {JSON} options time configuration
  */
@@ -23593,8 +23591,8 @@ function TimeStack() {
  * Calculates map aggregation with several binning algorithms
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  */
 Binning = function(map, options) {
 
@@ -24337,8 +24335,8 @@ Binning.prototype = {
  * implementation for aggregation of map items
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  *
  * @param {OpenLayers.Map} olMap openlayers map object of the map widget
  * @param {JSON} options map configuration
@@ -24454,8 +24452,8 @@ MapDataSource.prototype = {
  * Dynamic Delaunay clustering algorithm (see GeoTemCo paper)
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  */
 
 function Vertex(x, y, categories, binning) {
@@ -25337,8 +25335,8 @@ BinaryHeap.prototype = {
  * Implementation for Dropdown box
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  *
  * @param {HTML object} parent parent div for the dropdown box
  * @param {Array} elements list of dropdown entries
@@ -25459,8 +25457,8 @@ function Dropdown(parent, elements, title) {
  * GeoTemCo style for map zoom control
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  */
 function MapZoomSlider(parent, orientation) {
 
@@ -25554,8 +25552,8 @@ function MapZoomSlider(parent, orientation) {
  * map popup implementaion
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  */
 function MapPopup(parent) {
 
@@ -25677,8 +25675,8 @@ function MapPopup(parent) {
  * specific map popup for showing and interacting on placename labels
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  */
 function PlacenamePopup(parent) {
 
@@ -25887,8 +25885,8 @@ function PlacenamePopup(parent) {
  * Publish/Subscribe mechanism
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  */
 if ( typeof Publisher == 'undefined') {
 
@@ -25962,8 +25960,8 @@ if ( typeof Publisher == 'undefined') {
  * Interface-like implementation for widgets interaction to each other; aimed to be modified for dynamic data sources
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  *
  * @param {Object} widget either a map, time or table widget
  */
@@ -26051,8 +26049,8 @@ function WidgetWrapper() {
  * code which is included after all other sources have been included for the minified version
  * @author Stefan Jänicke (stjaenicke@informatik.uni-leipzig.de)
  * @release 1.0
- * @release date: 2012-07-25
- * @version date: 2012-07-25
+ * @release date: 2012-07-27
+ * @version date: 2012-07-27
  */
 
 OpenLayers.Util.getImagesLocation = function() {
