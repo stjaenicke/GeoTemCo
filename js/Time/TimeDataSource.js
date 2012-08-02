@@ -63,7 +63,7 @@ TimeDataSource.prototype = {
 				slices++;
 				time.incrementByInterval(t, i, undefined);
 			} while( t.getTime() <= this.maxDate.getTime() && slices < pixels+2 );
-			if (slices > 2 && slices <= pixels) {
+			if (slices > 0 && slices <= pixels) {
 				this.availableUnits.push({
 					unit : i,
 					slices : slices,
