@@ -1269,9 +1269,11 @@ TimeWidget.prototype = {
 	},
 
 	drawLinearPlot : function() {
-		if ( typeof this.valueGeometry != 'undefined') {
+		if ( typeof this.valueGeometry != 'undefined') {			
 			this.valueGeometry.actLinear();
 			this.timeplot.repaint();
+			this.resetOpacityPlots();
+			this.displayOverlay();
 		}
 	},
 
@@ -1279,6 +1281,8 @@ TimeWidget.prototype = {
 		if ( typeof this.valueGeometry != 'undefined') {
 			this.valueGeometry.actLogarithmic();
 			this.timeplot.repaint();
+			this.resetOpacityPlots();
+			this.displayOverlay();
 		}
 	}
 }
