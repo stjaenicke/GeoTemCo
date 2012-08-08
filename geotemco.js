@@ -19017,7 +19017,7 @@ function MapGui(map, div, options) {
 			}
 			var setBinning = function() {
 				options.binning = id;
-				gui.map.initMap(gui.map.mapObjects, false);
+				gui.map.initWidget(gui.map.datasets, false);
 				gui.map.riseLayer();
 			}
 			binnings.push({
@@ -23738,7 +23738,7 @@ Binning.prototype = {
 				}
 				var radius = this.options.minimumRadius;
 				if (this.options.noBinningRadii == 'dynamic') {
-					radius = this.options.getRadius(weight);
+					radius = this.getRadius(weight);
 				}
 				var circle = new CircleObject(p.x, p.y, 0, 0, bin, radius, i, weight);
 				circles[i].push(circle);
@@ -23931,16 +23931,20 @@ Binning.prototype = {
 		if (n == 0) {
 			return 0;
 		}
+		/*
 		function log2(x) {
 			return (Math.log(x)) / (Math.log(2));
 		}
-
 		var r0 = this.options.minimumRadius;
 		var r;
 		if ( typeof r_max == 'undefined') {
 			return r0 + n / Math.sqrt(this.options.maximumPoints);
 		}
 		return r0 + (r_max - r0 ) * log2(n) / log2(N);
+		*/
+		var minArea = Math.PI * this.options.minimumRadius * this.options.minimumRadius;
+		var maxArea = Math.PI * r_max * r_max;
+		return Math.sqrt((minArea + (maxArea - minArea) / (N - 1) * (n - 1) ) / Math.PI);
 	},
 
 	shift : function(type, bin, radius, elements) {

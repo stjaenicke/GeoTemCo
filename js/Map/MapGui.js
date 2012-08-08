@@ -306,7 +306,7 @@ function MapGui(map, div, options) {
 			}
 			var setBinning = function() {
 				options.binning = id;
-				gui.map.initMap(gui.map.mapObjects, false);
+				gui.map.initWidget(gui.map.datasets, false);
 				gui.map.riseLayer();
 			}
 			binnings.push({
