@@ -35,8 +35,10 @@ function TableWidget(core, div, options) {
 
 	this.core = core;
 	this.core.setWidget(this);
-	this.tables
-	this.hashMapping
+	this.tables = [];
+	this.tableTabs = [];
+	this.tableElements = [];
+	this.tableHash = [];
 
 	this.options = (new TableConfig(options)).options;
 	this.gui = new TableGui(this, div, this.options);
@@ -106,7 +108,7 @@ TableWidget.prototype = {
 			}
 			this.activeTable = index;
 			this.tables[this.activeTable].show();
-			var c = GeoTemConfig.colors[this.activeTable];
+			var c = GeoTemConfig.getColor(this.activeTable);
 			this.tableTabs[this.activeTable].style.backgroundColor = 'rgb(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ')';
 			this.core.triggerRise(index);
 		}
@@ -114,6 +116,9 @@ TableWidget.prototype = {
 	},
 
 	highlightChanged : function(objects) {
+		if( this.tables.length > 0 ){
+			return;
+		}
 		for (var i = 0; i < this.tableElements.length; i++) {
 			for (var j = 0; j < this.tableElements[i].length; j++) {
 				this.tableElements[i][j].highlighted = false;
@@ -129,6 +134,9 @@ TableWidget.prototype = {
 
 	selectionChanged : function(selection) {
 		this.reset();
+		if( this.tables.length == 0 ){
+			return;
+		}
 		this.selection = selection;
 		for (var i = 0; i < this.tableElements.length; i++) {
 			for (var j = 0; j < this.tableElements[i].length; j++) {
@@ -218,8 +226,10 @@ TableWidget.prototype = {
 
 	reset : function() {
 		this.filterBar.reset(false);
-		this.tables[this.activeTable].resetElements();
-		this.tables[this.activeTable].reset();
-		this.tables[this.activeTable].update();
+		if( this.tables.length > 0 ){
+			this.tables[this.activeTable].resetElements();
+			this.tables[this.activeTable].reset();
+			this.tables[this.activeTable].update();
+		}
 	}
 }

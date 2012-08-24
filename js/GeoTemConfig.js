@@ -88,6 +88,20 @@ GeoTemConfig.applySettings = function(settings) {
 	$.extend(this, settings);
 };
 
+GeoTemConfig.getColor = function(id){
+	if( GeoTemConfig.colors.length <= id ){
+		GeoTemConfig.colors.push({
+			r1 : Math.floor((Math.random()*255)+1),
+			g1 : Math.floor((Math.random()*255)+1),
+			b1 : Math.floor((Math.random()*255)+1),
+			r0 : 230,
+			g0 : 230,
+			b0 : 230
+		});
+	}
+	return GeoTemConfig.colors[id];
+};
+
 GeoTemConfig.getString = function(field) {
 	if ( typeof Tooltips[GeoTemConfig.language] == 'undefined') {
 		GeoTemConfig.language = 'en';
@@ -152,17 +166,28 @@ GeoTemConfig.mergeObjects = function(set1, set2) {
  * @param {String} url the url of the file to load
  * @return xml dom object of given file
  */
-GeoTemConfig.getKml = function(url) {
+GeoTemConfig.getKml = function(url,asyncFunc) {
 	var data;
+	var async = false;
+	if( asyncFunc ){
+		async = true;
+	}
 	$.ajax({
 		url : url,
-		async : false,
+		async : async,
 		dataType : 'xml',
 		success : function(xml) {
-			data = xml;
+			if( asyncFunc ){
+				asyncFunc(xml);
+			}
+			else {
+				data = xml;
+			}
 		}
 	});
-	return data;
+	if( !async ){
+		return data;
+	}
 }
 
 /**
@@ -306,7 +331,7 @@ GeoTemConfig.loadKml = function(kml) {
 	var mapObjects = [];
 	var elements = kml.getElementsByTagName("Placemark");
 	if (elements.length == 0) {
-		return null;
+		return [];
 	}
 	var index = 0;
 	for (var i = 0; i < elements.length; i++) {
@@ -323,7 +348,7 @@ GeoTemConfig.loadKml = function(kml) {
 
 		try {
 			description = placemark.getElementsByTagName("description")[0].childNodes[0].nodeValue;
-			tableContent["thumbnail"] = description;
+			tableContent["description"] = description;
 		} catch(e) {
 			description = "";
 		}

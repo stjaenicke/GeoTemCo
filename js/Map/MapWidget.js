@@ -877,7 +877,7 @@ MapWidget.prototype = {
 			for (var j = 0; j < points[i].length; j++) {
 				for (var k = 0; k < points[i][j].length; k++) {
 					var point = points[i][j][k];
-					var c = GeoTemConfig.colors[point.search];
+					var c = GeoTemConfig.getColor(point.search);
 					var transparency = 1;
 					if (this.options.circleTransparency) {
 						var min = this.options.minTransparency;

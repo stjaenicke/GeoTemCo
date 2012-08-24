@@ -404,7 +404,7 @@ Table.prototype = {
 			this.first = this.page * this.resultsPerPage;
 		}
 		//this.last = ( this.page + 1 == this.pages ) ? this.elements.length : this.first + this.resultsPerPage;
-		var c = GeoTemConfig.colors[this.id];
+		var c = GeoTemConfig.getColor(this.id);
 		var itemSet = [];
 		var clearDivs = function() {
 			for (var i = 0; i < itemSet.length; i++) {

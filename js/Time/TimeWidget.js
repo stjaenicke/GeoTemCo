@@ -111,7 +111,7 @@ TimeWidget.prototype = {
 			var dataSource = new Timeplot.ColumnSource(eventSource, 1);
 			this.dataSources.push(dataSource);
 			this.eventSources.push(eventSource);
-			var c = GeoTemConfig.colors[i];
+			var c = GeoTemConfig.getColor(i);
 			var plotInfo = Timeplot.createPlotInfo({
 				id : "plot" + i,
 				dataSource : dataSource,
@@ -398,7 +398,7 @@ TimeWidget.prototype = {
 			});
 			var plots = plot.timeplot._plots;
 			for ( i = 0; i < plots.length; i++) {
-				plots[i].fullOpacityPlot(plot.leftFlagTime, plot.rightFlagTime, plot.leftFlagPos, plot.rightFlagPos, GeoTemConfig.colors[i]);
+				plots[i].fullOpacityPlot(plot.leftFlagTime, plot.rightFlagTime, plot.leftFlagPos, plot.rightFlagPos, GeoTemConfig.getColor(i));
 				plots[i].opacityPlot.style.visibility = "visible";
 			}
 			var unit = plot.tds.unit;
@@ -684,7 +684,7 @@ TimeWidget.prototype = {
 							if (elements[i].length == 0) {
 								continue;
 							}
-							var c = GeoTemConfig.colors[i];
+							var c = GeoTemConfig.getColor(i);
 							var color = 'rgb(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ')';
 							var div = document.createElement("div");
 							div.setAttribute('class', 'tagCloudItem');
@@ -829,7 +829,7 @@ TimeWidget.prototype = {
 				plots[i]._opacityCanvas.width = this.canvas.width;
 				plots[i]._opacityCanvas.height = this.canvas.height;
 				if( plot.leftFlagTime != null ){
-					plots[i].fullOpacityPlot(plot.leftFlagTime, plot.rightFlagTime, plot.leftFlagPos, plot.rightFlagPos, GeoTemConfig.colors[i]);
+					plots[i].fullOpacityPlot(plot.leftFlagTime, plot.rightFlagTime, plot.leftFlagPos, plot.rightFlagPos, GeoTemConfig.getColor(i));
 				}
 			}
 		}
@@ -1021,7 +1021,8 @@ TimeWidget.prototype = {
 			ctx.fill();
 			for (var j = 0; j < heights.length; j++) {
 				if (heights[j] > 0) {
-					ctx.fillStyle = "rgba(" + GeoTemConfig.colors[j].r1 + "," + GeoTemConfig.colors[j].g1 + "," + GeoTemConfig.colors[j].b1 + ",0.6)";
+					var color = GeoTemConfig.getColor(j);
+					ctx.fillStyle = "rgba(" + color.r1 + "," + color.g1 + "," + color.b1 + ",0.6)";
 					ctx.beginPath();
 					ctx.arc(pos, this.canvas.height - heights[j], 2.5, 0, Math.PI * 2, true);
 					ctx.closePath();
