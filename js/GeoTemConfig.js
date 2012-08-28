@@ -309,7 +309,9 @@ GeoTemConfig.loadJson = function(JSON) {
 				if (time == null && !GeoTemConfig.incompleteData) {
 					throw "e";
 				}
-				dates.push(time);
+				if (time != null) {
+					dates.push(time);
+				}
 			}
 			var weight = item.weight || 1;
 			var mapTimeObject = new DataObject(name, description, locations, dates, weight, tableContent);

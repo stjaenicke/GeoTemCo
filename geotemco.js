@@ -17348,6 +17348,20 @@ GeoTemConfig.applySettings = function(settings) {
 	$.extend(this, settings);
 };
 
+GeoTemConfig.getColor = function(id){
+	if( GeoTemConfig.colors.length <= id ){
+		GeoTemConfig.colors.push({
+			r1 : Math.floor((Math.random()*255)+1),
+			g1 : Math.floor((Math.random()*255)+1),
+			b1 : Math.floor((Math.random()*255)+1),
+			r0 : 230,
+			g0 : 230,
+			b0 : 230
+		});
+	}
+	return GeoTemConfig.colors[id];
+};
+
 GeoTemConfig.getString = function(field) {
 	if ( typeof Tooltips[GeoTemConfig.language] == 'undefined') {
 		GeoTemConfig.language = 'en';
@@ -17412,17 +17426,28 @@ GeoTemConfig.mergeObjects = function(set1, set2) {
  * @param {String} url the url of the file to load
  * @return xml dom object of given file
  */
-GeoTemConfig.getKml = function(url) {
+GeoTemConfig.getKml = function(url,asyncFunc) {
 	var data;
+	var async = false;
+	if( asyncFunc ){
+		async = true;
+	}
 	$.ajax({
 		url : url,
-		async : false,
+		async : async,
 		dataType : 'xml',
 		success : function(xml) {
-			data = xml;
+			if( asyncFunc ){
+				asyncFunc(xml);
+			}
+			else {
+				data = xml;
+			}
 		}
 	});
-	return data;
+	if( !async ){
+		return data;
+	}
 }
 
 /**
@@ -17544,7 +17569,9 @@ GeoTemConfig.loadJson = function(JSON) {
 				if (time == null && !GeoTemConfig.incompleteData) {
 					throw "e";
 				}
-				dates.push(time);
+				if (time != null) {
+					dates.push(time);
+				}
 			}
 			var weight = item.weight || 1;
 			var mapTimeObject = new DataObject(name, description, locations, dates, weight, tableContent);
@@ -17566,7 +17593,7 @@ GeoTemConfig.loadKml = function(kml) {
 	var mapObjects = [];
 	var elements = kml.getElementsByTagName("Placemark");
 	if (elements.length == 0) {
-		return null;
+		return [];
 	}
 	var index = 0;
 	for (var i = 0; i < elements.length; i++) {
@@ -17583,7 +17610,7 @@ GeoTemConfig.loadKml = function(kml) {
 
 		try {
 			description = placemark.getElementsByTagName("description")[0].childNodes[0].nodeValue;
-			tableContent["thumbnail"] = description;
+			tableContent["description"] = description;
 		} catch(e) {
 			description = "";
 		}
@@ -18108,7 +18135,7 @@ function PlacenameTags(circle, map) {
 	this.calculatePlacenameTags = function() {
 		var cloud = this;
 
-		var c = GeoTemConfig.colors[this.circle.search];
+		var c = GeoTemConfig.getColor(this.circle.search);
 		var color0 = 'rgb(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ')';
 		var color1 = 'rgb(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ')';
 		var allStyles = "", hoverStyle = "", highlightStyle = "", selectedStyle = "", unselectedStyle = "";
@@ -18343,7 +18370,7 @@ function PackPlacenameTags(circle, map) {
 		var hoverStyles = [];
 
 		for (var k = 0; k < this.placeLabels.length; k++) {
-			var c = GeoTemConfig.colors[this.circle.circles[k].search];
+			var c = GeoTemConfig.getColor(this.circle.circles[k].search);
 			var color0 = 'rgb(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ')';
 			var color1 = 'rgb(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ')';
 			var allStyles = "", hoverStyle = "", highlightStyle = "", selectedStyle = "", unselectedStyle = "";
@@ -18371,7 +18398,7 @@ function PackPlacenameTags(circle, map) {
 					if (!label.opposite) {
 						var oppositeLabel, oppositeLabelDiv;
 						label.div.setAttribute('style', allStyles + "" + selectedStyles[id]);
-						var c = GeoTemConfig.colors[id];
+						var c = GeoTemConfig.getColor(id);
 						var color0 = 'rgb(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ')';
 						if (id == 0) {
 							for (var i = 0; i < cloud.droppedLabels[1].length; i++) {
@@ -19931,7 +19958,7 @@ MapWidget.prototype = {
 			for (var j = 0; j < points[i].length; j++) {
 				for (var k = 0; k < points[i][j].length; k++) {
 					var point = points[i][j][k];
-					var c = GeoTemConfig.colors[point.search];
+					var c = GeoTemConfig.getColor(point.search);
 					var transparency = 1;
 					if (this.options.circleTransparency) {
 						var min = this.options.minTransparency;
@@ -20927,7 +20954,7 @@ TimeWidget.prototype = {
 			var dataSource = new Timeplot.ColumnSource(eventSource, 1);
 			this.dataSources.push(dataSource);
 			this.eventSources.push(eventSource);
-			var c = GeoTemConfig.colors[i];
+			var c = GeoTemConfig.getColor(i);
 			var plotInfo = Timeplot.createPlotInfo({
 				id : "plot" + i,
 				dataSource : dataSource,
@@ -21214,7 +21241,7 @@ TimeWidget.prototype = {
 			});
 			var plots = plot.timeplot._plots;
 			for ( i = 0; i < plots.length; i++) {
-				plots[i].fullOpacityPlot(plot.leftFlagTime, plot.rightFlagTime, plot.leftFlagPos, plot.rightFlagPos, GeoTemConfig.colors[i]);
+				plots[i].fullOpacityPlot(plot.leftFlagTime, plot.rightFlagTime, plot.leftFlagPos, plot.rightFlagPos, GeoTemConfig.getColor(i));
 				plots[i].opacityPlot.style.visibility = "visible";
 			}
 			var unit = plot.tds.unit;
@@ -21500,7 +21527,7 @@ TimeWidget.prototype = {
 							if (elements[i].length == 0) {
 								continue;
 							}
-							var c = GeoTemConfig.colors[i];
+							var c = GeoTemConfig.getColor(i);
 							var color = 'rgb(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ')';
 							var div = document.createElement("div");
 							div.setAttribute('class', 'tagCloudItem');
@@ -21645,7 +21672,7 @@ TimeWidget.prototype = {
 				plots[i]._opacityCanvas.width = this.canvas.width;
 				plots[i]._opacityCanvas.height = this.canvas.height;
 				if( plot.leftFlagTime != null ){
-					plots[i].fullOpacityPlot(plot.leftFlagTime, plot.rightFlagTime, plot.leftFlagPos, plot.rightFlagPos, GeoTemConfig.colors[i]);
+					plots[i].fullOpacityPlot(plot.leftFlagTime, plot.rightFlagTime, plot.leftFlagPos, plot.rightFlagPos, GeoTemConfig.getColor(i));
 				}
 			}
 		}
@@ -21837,7 +21864,8 @@ TimeWidget.prototype = {
 			ctx.fill();
 			for (var j = 0; j < heights.length; j++) {
 				if (heights[j] > 0) {
-					ctx.fillStyle = "rgba(" + GeoTemConfig.colors[j].r1 + "," + GeoTemConfig.colors[j].g1 + "," + GeoTemConfig.colors[j].b1 + ",0.6)";
+					var color = GeoTemConfig.getColor(j);
+					ctx.fillStyle = "rgba(" + color.r1 + "," + color.g1 + "," + color.b1 + ",0.6)";
 					ctx.beginPath();
 					ctx.arc(pos, this.canvas.height - heights[j], 2.5, 0, Math.PI * 2, true);
 					ctx.closePath();
@@ -22240,8 +22268,10 @@ function TableWidget(core, div, options) {
 
 	this.core = core;
 	this.core.setWidget(this);
-	this.tables
-	this.hashMapping
+	this.tables = [];
+	this.tableTabs = [];
+	this.tableElements = [];
+	this.tableHash = [];
 
 	this.options = (new TableConfig(options)).options;
 	this.gui = new TableGui(this, div, this.options);
@@ -22311,7 +22341,7 @@ TableWidget.prototype = {
 			}
 			this.activeTable = index;
 			this.tables[this.activeTable].show();
-			var c = GeoTemConfig.colors[this.activeTable];
+			var c = GeoTemConfig.getColor(this.activeTable);
 			this.tableTabs[this.activeTable].style.backgroundColor = 'rgb(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ')';
 			this.core.triggerRise(index);
 		}
@@ -22319,6 +22349,9 @@ TableWidget.prototype = {
 	},
 
 	highlightChanged : function(objects) {
+		if( this.tables.length > 0 ){
+			return;
+		}
 		for (var i = 0; i < this.tableElements.length; i++) {
 			for (var j = 0; j < this.tableElements[i].length; j++) {
 				this.tableElements[i][j].highlighted = false;
@@ -22334,6 +22367,9 @@ TableWidget.prototype = {
 
 	selectionChanged : function(selection) {
 		this.reset();
+		if( this.tables.length == 0 ){
+			return;
+		}
 		this.selection = selection;
 		for (var i = 0; i < this.tableElements.length; i++) {
 			for (var j = 0; j < this.tableElements[i].length; j++) {
@@ -22423,9 +22459,11 @@ TableWidget.prototype = {
 
 	reset : function() {
 		this.filterBar.reset(false);
-		this.tables[this.activeTable].resetElements();
-		this.tables[this.activeTable].reset();
-		this.tables[this.activeTable].update();
+		if( this.tables.length > 0 ){
+			this.tables[this.activeTable].resetElements();
+			this.tables[this.activeTable].reset();
+			this.tables[this.activeTable].update();
+		}
 	}
 }
 /*
@@ -22834,7 +22872,7 @@ Table.prototype = {
 			this.first = this.page * this.resultsPerPage;
 		}
 		//this.last = ( this.page + 1 == this.pages ) ? this.elements.length : this.first + this.resultsPerPage;
-		var c = GeoTemConfig.colors[this.id];
+		var c = GeoTemConfig.getColor(this.id);
 		var itemSet = [];
 		var clearDivs = function() {
 			for (var i = 0; i < itemSet.length; i++) {
