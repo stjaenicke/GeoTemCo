@@ -71,6 +71,12 @@ function WidgetWrapper() {
 		}
 	});
 
+	Publisher.Subscribe('resize', this, function() {
+		if ( typeof wrapper.widget != 'undefined' && typeof wrapper.widget.gui != 'undefined'  && typeof wrapper.widget.gui.resize != 'undefined' ) {
+			wrapper.widget.gui.resize();
+		}
+	});
+
 	this.triggerRefining = function(datasets) {
 		Publisher.Publish('filter', datasets, null);
 	};
