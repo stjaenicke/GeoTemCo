@@ -71,8 +71,8 @@ function WidgetWrapper() {
 		}
 	});
 
-	Publisher.Subscribe('resize', this, function() {
-		if ( typeof wrapper.widget != 'undefined' && typeof wrapper.widget.gui != 'undefined'  && typeof wrapper.widget.gui.resize != 'undefined' ) {
+	Publisher.Subscribe('resizeWidget', this, function() {
+		if ( typeof wrapper.widget != 'undefined' && typeof wrapper.widget.gui != 'undefined' && typeof wrapper.widget.gui.resize != 'undefined' ) {
 			wrapper.widget.gui.resize();
 		}
 	});
