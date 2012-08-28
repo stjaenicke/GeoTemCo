@@ -98,13 +98,13 @@ function TimeGui(plot, div, options) {
 	}
 	setCanvas();
 
-	$(window).resize(function(){
+	this.resize = function(){
 		gui.timeplotDiv.style.width = (gui.container.offsetWidth - 32) + "px";
 		ctx.clearRect(0,0,gui.plotWindow.clientWidth, gui.plotWindow.clientHeight);
 		plot.redrawPlot();
 		plot.resetOpacityPlots();
 		setCanvas();
-	});
+	};
 
 	var titles = document.createElement("tr");
 	toolbarTable.appendChild(titles);

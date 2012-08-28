@@ -337,7 +337,4 @@ function MapGui(map, div, options) {
 		return c;
 	}
 
-	$(window).resize(function(){
-		
-	});
 };
