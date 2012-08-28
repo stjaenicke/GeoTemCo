@@ -19075,9 +19075,6 @@ function MapGui(map, div, options) {
 		return c;
 	}
 
-	$(window).resize(function(){
-		
-	});
 };
 /*
 * MapWidget.js
@@ -20646,13 +20643,13 @@ function TimeGui(plot, div, options) {
 	}
 	setCanvas();
 
-	$(window).resize(function(){
+	this.resize = function(){
 		gui.timeplotDiv.style.width = (gui.container.offsetWidth - 32) + "px";
 		ctx.clearRect(0,0,gui.plotWindow.clientWidth, gui.plotWindow.clientHeight);
 		plot.redrawPlot();
 		plot.resetOpacityPlots();
 		setCanvas();
-	});
+	};
 
 	var titles = document.createElement("tr");
 	toolbarTable.appendChild(titles);
@@ -26051,6 +26048,12 @@ function WidgetWrapper() {
 	Publisher.Subscribe('rise', this, function(id) {
 		if ( typeof wrapper.widget != 'undefined' && typeof wrapper.widget.riseLayer != 'undefined') {
 			wrapper.widget.riseLayer(id);
+		}
+	});
+
+	Publisher.Subscribe('resize', this, function() {
+		if ( typeof wrapper.widget != 'undefined' && typeof wrapper.widget.gui != 'undefined'  && typeof wrapper.widget.gui.resize != 'undefined' ) {
+			wrapper.widget.gui.resize();
 		}
 	});
 
