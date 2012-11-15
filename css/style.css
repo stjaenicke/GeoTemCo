@@ -277,6 +277,7 @@ filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
 	overflow: hidden;
 	z-index: 2;
 	width: 100%;
+	background-color: #bbd0ed;
 }
 
 #mapContainer {

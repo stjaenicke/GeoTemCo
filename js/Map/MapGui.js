@@ -54,13 +54,6 @@ function MapGui(map, div, options) {
 	this.mapContainer.style.zIndex = 0;
 	this.mapWindow.appendChild(this.mapContainer);
 
-	this.background = document.createElement("canvas");
-	this.background.setAttribute('class', 'mapCanvas');
-	this.mapWindow.appendChild(this.background);
-	if (!this.background.getContext && G_vmlCanvasManager) {
-		this.background = G_vmlCanvasManager.initElement(this.background);
-	}
-
 	var toolbarTable = document.createElement("table");
 	toolbarTable.setAttribute('class', 'absoluteToolbar ddbToolbar');
 	this.container.appendChild(toolbarTable);
@@ -237,14 +230,6 @@ function MapGui(map, div, options) {
 		if (options.resetMap) {
 			this.homeButton.style.top = top + "px";
 		}
-		this.background.width = w;
-		this.background.height = h;
-		var ctx = this.background.getContext('2d');
-		var gradient = ctx.createLinearGradient(0, 0, 0, h);
-		gradient.addColorStop(0, options.mapCanvasFrom);
-		gradient.addColorStop(1, options.mapCanvasTo);
-		ctx.fillStyle = gradient;
-		ctx.fillRect(0, 0, w, h);
 		this.headerHeight = toolbarTable.offsetHeight;
 		this.headerWidth = toolbarTable.offsetWidth;
 	};

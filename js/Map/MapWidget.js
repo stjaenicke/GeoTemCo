@@ -111,7 +111,7 @@ MapWidget.prototype = {
 		var linkForLicense = 'http://creativecommons.org/licenses/by-sa/2.0/';
 		this.osmLink = document.createElement("div");
 		this.osmLink.setAttribute('class', 'osmLink');
-		this.osmLink.innerHTML = '© <a href=' + linkForOsm + '>OpenStreetMap contributors</a>, <a href=' + linkForLicense + '>CC-BY-SA</a>';
+		this.osmLink.innerHTML = '(c) <a href=' + linkForOsm + '>OpenStreetMap contributors</a>, <a href=' + linkForLicense + '>CC-BY-SA</a>';
 		this.gui.mapWindow.appendChild(this.osmLink);
 
 		this.filterBar = new FilterBar(this, this.gui.filterOptions);
