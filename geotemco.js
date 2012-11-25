@@ -14935,8 +14935,12 @@ Timeplot.DefaultTimeGeometry.prototype._calculateGrid = function() {
 		unit = time.YEAR;
 	} else if (periodUnit < time.CENTURY) {
 		unit = time.DECADE;
-	} else {
+	} else if (periodUnit < time.HALFMILLENNIUM) {
 		unit = time.CENTURY;
+	} else if (periodUnit < time.MILLENNIUM) {
+		unit = time.HALFMILLENNIUM;
+	} else {
+		unit = time.MILLENNIUM;
 	}
 
 	if (unit < this._granularity) {
@@ -21016,6 +21020,7 @@ TimeWidget.prototype = {
 				});
 			}
 		}
+		this.initLabels([]);
 	},
 
 	/**

@@ -191,6 +191,7 @@ TimeWidget.prototype = {
 				});
 			}
 		}
+		this.initLabels([]);
 	},
 
 	/**
