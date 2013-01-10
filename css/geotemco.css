@@ -1364,7 +1364,15 @@ filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
 	overflow-y: auto;
 }
 
-.ddbPopupInput tr, th, td {
+.ddbPopupInput tr {
+	font-size: 13px;
+}
+
+.ddbPopupInput th {
+	font-size: 13px;
+}
+
+.ddbPopupInput td {
 	font-size: 13px;
 }
 

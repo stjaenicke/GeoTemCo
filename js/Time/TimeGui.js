@@ -101,8 +101,10 @@ function TimeGui(plot, div, options) {
 	this.resize = function(){
 		gui.timeplotDiv.style.width = (gui.container.offsetWidth - 32) + "px";
 		ctx.clearRect(0,0,gui.plotWindow.clientWidth, gui.plotWindow.clientHeight);
-		plot.redrawPlot();
-		plot.resetOpacityPlots();
+		if( typeof plot.datasets != "undefined" ){
+			plot.redrawPlot();
+			plot.resetOpacityPlots();
+		}
 		setCanvas();
 	};
 
