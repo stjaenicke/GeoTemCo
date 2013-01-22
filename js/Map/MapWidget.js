@@ -48,9 +48,10 @@ function MapWidget(core, div, options) {
 
 	this.div = div;
 
+	this.iid = GeoTemConfig.getIndependentId('map');
 	this.options = (new MapConfig(options)).options;
 	this.formerCP = this.options.circlePackings;
-	this.gui = new MapGui(this, this.div, this.options);
+	this.gui = new MapGui(this, this.div, this.options, this.iid);
 
 	this.initialize();
 
@@ -164,7 +165,7 @@ MapWidget.prototype = {
 			units : 'meters',
 			maxExtent : new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34)
 		};
-		this.openlayersMap = new OpenLayers.Map("mapContainer", options);
+		this.openlayersMap = new OpenLayers.Map("mapContainer"+this.iid, options);
 		if (map.options.navigate) {
 			this.activeControl = "navigate";
 		}
@@ -636,8 +637,12 @@ MapWidget.prototype = {
 		if (this.options.alternativeMap) {
 			this.addBaseLayers([this.options.alternativeMap]);
 		}
+		this.setBaseLayerByName(this.options.baseLayer);
+	},
+
+	setBaseLayerByName : function(name){
 		for (var i = 0; i < this.baseLayers.length; i++) {
-			if (this.baseLayers[i].name == this.options.baseLayer) {
+			if (this.baseLayers[i].name == name) {
 				this.setMap(i);
 			}
 		}
@@ -878,18 +883,24 @@ MapWidget.prototype = {
 				for (var k = 0; k < points[i][j].length; k++) {
 					var point = points[i][j][k];
 					var c = GeoTemConfig.getColor(point.search);
-					var transparency = 1;
-					if (this.options.circleTransparency) {
+					var opacity;
+					if (this.options.circleOpacity == 'balloon') {
 						var min = this.options.minTransparency;
 						var max = this.options.maxTransparency;
-						transparency = min + Math.abs(min - max) * (1 - (getArea(point.radius) - minArea) / areaDiff);
+						opacity = min + Math.abs(min - max) * (1 - (getArea(point.radius) - minArea) / areaDiff);
 					}
-					var col = this.options.circleOutline;
-					//transparency = 0.8;
+					else {
+						opacity = this.options.circleOpacity;
+					}
+					var col = false, ols = 0;
+					if( this.options.circleOutline ){
+						col = true;
+						ols = this.options.circleOutline;
+					}
 					var style = {
 						fillColor : 'rgb(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ')',
-						fillOpacity : transparency,
-						strokeWidth : 2,
+						fillOpacity : opacity,
+						strokeWidth : ols,
 						strokeColor : 'rgb(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ')',
 						stroke : col,
 						pointRadius : point.radius,
@@ -902,7 +913,7 @@ MapWidget.prototype = {
 					point.setFeature(feature);
 					var olStyle = {
 						fillColor : 'rgb(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ')',
-						fillOpacity : transparency,
+						fillOpacity : opacity,
 						stroke : false,
 						pointRadius : 0,
 						cursor : "pointer"
@@ -1010,6 +1021,9 @@ MapWidget.prototype = {
 	 * updates the the object layer of the map after selections had been executed in timeplot or table or zoom level has changed
 	 */
 	highlightChanged : function(mapObjects) {
+		if( !GeoTemConfig.highlightEvents ){
+			return;
+		}
 		this.mds.clearOverlay();
 		if (this.selection.valid()) {
 			this.mds.setOverlay(GeoTemConfig.mergeObjects(mapObjects, this.selection.getObjects()));
@@ -1027,6 +1041,9 @@ MapWidget.prototype = {
 	},
 
 	selectionChanged : function(selection) {
+		if( !GeoTemConfig.selectionEvents ){
+			return;
+		}
 		this.reset();
 		this.selection = selection;
 		this.highlightChanged(selection.objects);

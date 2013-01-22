@@ -35,6 +35,8 @@ var GeoTemConfig = {
 	mouseWheelZoom : true, // enable/disable zoom with mouse wheel on map & timeplot
 	language : 'en', // default language of GeoTemCo
 	allowFilter : true, // if filtering should be allowed
+	highlightEvents : true, // if updates after highlight events
+	selectionEvents : true, // if updates after selection events
 	//colors for several datasets; rgb1 will be used for selected objects, rgb0 for unselected
 	colors : [{
 		r1 : 255,
@@ -71,11 +73,51 @@ var GeoTemConfig = {
 GeoTemConfig.ie = false;
 GeoTemConfig.ie8 = false;
 
+GeoTemConfig.independentMapId = 0;
+GeoTemConfig.independentTimeId = 0;
+
 if (/MSIE (\d+\.\d+);/.test(navigator.userAgent)) {
 	GeoTemConfig.ie = true;
 	var ieversion = new Number(RegExp.$1);
 	if (ieversion == 8) {
 		GeoTemConfig.ie8 = true;
+	}
+}
+
+GeoTemConfig.getIndependentId = function(target){
+	if( target == 'map' ){
+		return ++GeoTemConfig.independentMapId;
+	}
+	if( target == 'time' ){
+		return ++GeoTemConfig.independentTimeId;
+	}
+	return 0;
+};
+
+GeoTemConfig.setHexColor = function(hex,index,fill){
+	var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	if( fill ){
+		GeoTemConfig.colors[index].r0 = parseInt(result[1], 16);
+		GeoTemConfig.colors[index].g0 = parseInt(result[2], 16);
+		GeoTemConfig.colors[index].b0 = parseInt(result[3], 16);
+	}
+	else {
+		GeoTemConfig.colors[index].r1 = parseInt(result[1], 16);
+		GeoTemConfig.colors[index].g1 = parseInt(result[2], 16);
+		GeoTemConfig.colors[index].b1 = parseInt(result[3], 16);
+	}
+}
+
+GeoTemConfig.setRgbColor = function(r,g,b,index,fill){
+	if( fill ){
+		GeoTemConfig.colors[index].r0 = r;
+		GeoTemConfig.colors[index].g0 = g;
+		GeoTemConfig.colors[index].b0 = b;
+	}
+	else {
+		GeoTemConfig.colors[index].r1 = r;
+		GeoTemConfig.colors[index].g1 = g;
+		GeoTemConfig.colors[index].b1 = b;
 	}
 }
 

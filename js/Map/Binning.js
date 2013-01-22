@@ -218,7 +218,7 @@ Binning.prototype = {
 				selectionMap.push([]);
 			}
 			var resolution = this.map.getResolutionForZoom(this.zoomLevels - i - 1);
-			clustering.mergeForResolution(resolution, this.options.circleGap);
+			clustering.mergeForResolution(resolution, this.options.circleGap, this.options.circleOverlap);
 			for (var j = 0; j < clustering.vertices.length; j++) {
 				var point = clustering.vertices[j];
 				if (!point.legal) {

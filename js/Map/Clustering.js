@@ -608,11 +608,11 @@ Clustering.prototype.JordanTest = function(pol, e) {
 	return inside;
 }
 
-Clustering.prototype.mergeForResolution = function(resolution, circleGap) {
+Clustering.prototype.mergeForResolution = function(resolution, circleGap, circleOverlap) {
 	this.deleteEdges = new BinaryHeap(function(e) {
 		return e.weight;
 	});
-	this.weightEdges(resolution, circleGap);
+	this.weightEdges(resolution, circleGap, circleOverlap);
 	var index = 0;
 	while (this.deleteEdges.size() > 0) {
 		var e = this.deleteEdges.pop();
@@ -623,7 +623,37 @@ Clustering.prototype.mergeForResolution = function(resolution, circleGap) {
 			for (var k = l; k < this.edges.length; k++) {
 				var eNew = this.edges[k];
 				if (eNew.legal) {
-					eNew.weight = eNew.length / (eNew.v0.radius + eNew.v1.radius + circleGap * resolution );
+					if( circleGap != 0 ){
+						eNew.weight = eNew.length / (eNew.v0.radius + eNew.v1.radius + circleGap * resolution );
+					}
+					else if( circleOverlap.overlap == 0 ){
+						eNew.weight = eNew.length / (eNew.v0.radius + eNew.v1.radius);
+					}
+					else {
+						var r1 = eNew.v0.radius;
+						var r2 = eNew.v1.radius;
+						var r = eNew.length;
+						if( r < r1 + r2 ){
+							if( circleOverlap.type == 'diameter' ){
+								var ol1 = (r2-(r-r1)) / r1 / 2;
+								var ol2 = (r1-(r-r2)) / r2 / 2;
+								var ol = Math.max(ol1,ol2);
+								eNew.weight = circleOverlap.overlap / ol;
+							}
+							if( circleOverlap.type == 'area' ){								
+								if( !(r+r1 < r2 || r+r2 < r1) ){
+									var A = r2*r2*Math.acos((r*r+r2*r2-r1*r1)/(2*r*r2))+r1*r1*Math.acos((r*r+r1*r1-r2*r2)/(2*r*r1))-1/2*Math.sqrt((-r+r1+r2)*(r-r1+r2)*(r+r1-r2)*(r+r1+r2));
+									var ol1 = A / (Math.PI*r1*r1);
+									var ol2 = A / (Math.PI*r2*r2);
+									var ol = Math.max(ol1,ol2);
+									eNew.weight = circleOverlap.overlap / ol;
+								}
+								else {
+									eNew.weight = 0;
+								}
+							}
+						}
+					}
 					if (eNew.weight < 1) {
 						this.deleteEdges.push(eNew);
 					}
@@ -633,7 +663,7 @@ Clustering.prototype.mergeForResolution = function(resolution, circleGap) {
 	}
 }
 
-Clustering.prototype.weightEdges = function(resolution, circleGap) {
+Clustering.prototype.weightEdges = function(resolution, circleGap, circleOverlap) {
 	for (var i = 0; i < this.vertices.length; i++) {
 		if (this.vertices[i].legal) {
 			this.vertices[i].CalculateRadius(resolution);
@@ -646,7 +676,37 @@ Clustering.prototype.weightEdges = function(resolution, circleGap) {
 			if (!e.v0.legal || !e.v1.legal) {
 				e.weight = 1;
 			} else {
-				e.weight = e.length / (e.v0.radius + e.v1.radius + circleGap * resolution );
+				if( circleGap != 0 ){
+					e.weight = e.length / (e.v0.radius + e.v1.radius + circleGap * resolution );
+				}
+				else if( circleOverlap.overlap == 0 ){
+					e.weight = e.length / (e.v0.radius + e.v1.radius);
+				}
+				else {
+					var r1 = e.v0.radius;
+					var r2 = e.v1.radius;
+					var r = e.length;
+					if( r < r1 + r2 ){
+						if( circleOverlap.type == 'diameter' ){
+							var ol1 = (r2-(r-r1)) / r1 / 2;
+							var ol2 = (r1-(r-r2)) / r2 / 2;
+							var ol = Math.max(ol1,ol2);
+							e.weight = circleOverlap.overlap / ol;
+						}
+						if( circleOverlap.type == 'area' ){
+							if( !(r+r1 < r2 || r+r2 < r1) ){
+								var A = r2*r2*Math.acos((r*r+r2*r2-r1*r1)/(2*r*r2))+r1*r1*Math.acos((r*r+r1*r1-r2*r2)/(2*r*r1))-1/2*Math.sqrt((-r+r1+r2)*(r-r1+r2)*(r+r1-r2)*(r+r1+r2));
+								var ol1 = A / (Math.PI*r1*r1);
+								var ol2 = A / (Math.PI*r2*r2);
+								var ol = Math.max(ol1,ol2);
+								e.weight = circleOverlap.overlap / ol;
+							}
+							else {
+								e.weight = 0;
+							}
+						}
+					}
+				}
 				if (e.weight < 1) {
 					this.deleteEdges.push(e);
 				}
@@ -835,6 +895,7 @@ BinaryHeap.prototype = {
 				this.content[n] = parent;
 				// Update 'n' to continue at the new position.
 				n = parentN;
+
 			}
 			// Found a parent that is less, no need to move it further.
 			else {

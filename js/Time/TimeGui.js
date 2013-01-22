@@ -31,7 +31,7 @@
  * @param {HTML object} div parent div to append the time gui
  * @param {JSON} options time configuration
  */
-function TimeGui(plot, div, options) {
+function TimeGui(plot, div, options, iid) {
 
 	var gui = this;
 
@@ -54,7 +54,8 @@ function TimeGui(plot, div, options) {
 	this.container.appendChild(toolbarTable);
 
 	this.plotWindow = document.createElement("div");
-	this.plotWindow.id = "plotWindow";
+	this.plotWindow.id = "plotWindow"+iid;
+	this.plotWindow.setAttribute('class', 'plotWindow');
 //	this.plotWindow.style.width = w + "px";
 
 	this.plotWindow.style.height = (h + 12) + "px";
@@ -65,7 +66,8 @@ function TimeGui(plot, div, options) {
 	}
 
 	this.plotContainer = document.createElement("div");
-	this.plotContainer.id = "plotContainer";
+	this.plotContainer.id = "plotContainer"+iid;
+	this.plotContainer.setAttribute('class', 'plotContainer');
 //	this.plotContainer.style.width = w + "px";
 	this.plotContainer.style.height = h + "px";
 	this.plotContainer.style.position = "absolute";

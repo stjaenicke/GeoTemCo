@@ -66,8 +66,7 @@ function MapConfig(options) {
 			maxLon : 44,
 			maxLat : 67
 		}, // initial map boundaries or 'false' for no boundaries
-		mapCanvasFrom : '#9db9d8', // map widget background gradient color top
-		mapCanvasTo : '#5783b5', // map widget background gradient color bottom
+		mapBackground : '#bbd0ed',
 		labelGrid : true, // show label grid on hover
 		maxPlaceLabels : 6, // Integer value for fixed number of place labels: 0 --> unlimited, 1 --> 1 label (won't be shown in popup, 2 --> is not possible because of others & all labels --> 3 labels, [3,...,N] --> [3,...,N] place labels)
 		selectDefault : true, // true, if strongest label should be selected as default
@@ -82,9 +81,13 @@ function MapConfig(options) {
 		ieHoveredLabel : "color: COLOR1; font-weight: bold;", // css code for a hovered place label in IE
 		hoveredLabel : "color: COLOR1; font-weight: bold;", // css code for a hovered place label
 		circleGap : 0, // gap between the circles on the map (>=0)
+		circleOverlap : {
+			type: 'area', // 'area' or 'diameter' is possible
+			overlap: 0 // the percentage of allowed overlap (0<=overlap<=1)
+		}, // maximum allowed overlap in percent (if circleGap = 0, circleOverlap will be used)
 		minimumRadius : 4, // minimum radius of a circle with mimimal weight (>0)
-		circleOutline : true, // true if circles should have a default outline
-		circleTransparency : true, // transparency of the circles
+		circleOutline : 2, // false for no outline or a pixel value v with 0 < v
+		circleOpacity : 'balloon', // 'balloon' for dynamic opacity of the circles or a value t with 0 <= t <= 1
 		minTransparency : 0.4, // maximum transparency of a circle
 		maxTransparency : 0.8, // minimum transparency of a circle
 		binning : 'generic', // binning algorithm for the map, possible values are: 'generic', 'square', 'hexagonal', 'triangular' or false for 'no binning'

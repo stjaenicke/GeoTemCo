@@ -100,7 +100,6 @@ TableWidget.prototype = {
 	},
 
 	selectTable : function(index) {
-
 		if (this.activeTable != index) {
 			if ( typeof this.activeTable != 'undefined') {
 				this.tables[this.activeTable].hide();
@@ -116,6 +115,9 @@ TableWidget.prototype = {
 	},
 
 	highlightChanged : function(objects) {
+		if( !GeoTemConfig.highlightEvents ){
+			return;
+		}
 		if( this.tables.length > 0 ){
 			return;
 		}
@@ -133,6 +135,9 @@ TableWidget.prototype = {
 	},
 
 	selectionChanged : function(selection) {
+		if( !GeoTemConfig.selectionEvents ){
+			return;
+		}
 		this.reset();
 		if( this.tables.length == 0 ){
 			return;

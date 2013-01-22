@@ -64,8 +64,9 @@ function TimeWidget(core, div, options) {
 	this.status
 	this.slider
 
+	this.iid = GeoTemConfig.getIndependentId('time');
 	this.options = (new TimeConfig(options)).options;
-	this.gui = new TimeGui(this, div, this.options);
+	this.gui = new TimeGui(this, div, this.options, this.iid);
 	this.initialize();
 
 }
@@ -1037,6 +1038,9 @@ TimeWidget.prototype = {
 	 * updates the timeplot by displaying place poles, after a selection had been executed in another widget
 	 */
 	highlightChanged : function(timeObjects) {
+		if( !GeoTemConfig.highlightEvents ){
+			return;
+		}
 		this.resetOverlay();
 		if (this.selection.valid()) {
 			if (!this.selection.equal(this)) {
@@ -1054,6 +1058,9 @@ TimeWidget.prototype = {
 	 * updates the timeplot by displaying place poles, after a selection had been executed in another widget
 	 */
 	selectionChanged : function(selection) {
+		if( !GeoTemConfig.selectionEvents ){
+			return;
+		}
 		this.reset();
 		this.selection = selection;
 		this.tds.setOverlay(selection.objects);

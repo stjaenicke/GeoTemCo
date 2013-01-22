@@ -61,14 +61,14 @@
 /*
   settings for timeplot widget (some are overwritten timeplot css classes)
 */
-#plotWindow {
+.plotWindow {
 	position: relative;
 	border-bottom: 1px solid #ADADAD;
 	z-index: 1;
 	width: 100%;
 }
 
-#plotContainer {
+.plotContainer {
 	position: absolute;
 	padding: 0px;
 	border: none;
@@ -77,12 +77,6 @@
 	z-index: 1;
 	overflow: hidden;
 	width: 100%;
-}
-
-#timeplotToolbar dt, dl{
-  	padding: 2px 0px;
-	display: block;
-  	cursor: pointer;
 }
 
 .plotCanvas {
@@ -272,15 +266,14 @@ filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
 /*
   settings for map widget
 */
-#mapWindow {
+.mapWindow {
 	position: absolute;
 	overflow: hidden;
 	z-index: 2;
 	width: 100%;
-	background-color: #bbd0ed;
 }
 
-#mapContainer {
+.mapContainer {
 	width: 100%;
 }
 
@@ -303,12 +296,6 @@ filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
 
 .mapsMenu dt {
   	padding: 2px;
-	display: block;
-  	cursor: pointer;
-}
-
-#mapToolbar dt, dl{
-  	padding: 2px 0px;
 	display: block;
   	cursor: pointer;
 }

@@ -17299,6 +17299,8 @@ var GeoTemConfig = {
 	mouseWheelZoom : true, // enable/disable zoom with mouse wheel on map & timeplot
 	language : 'en', // default language of GeoTemCo
 	allowFilter : true, // if filtering should be allowed
+	highlightEvents : true, // if updates after highlight events
+	selectionEvents : true, // if updates after selection events
 	//colors for several datasets; rgb1 will be used for selected objects, rgb0 for unselected
 	colors : [{
 		r1 : 255,
@@ -17335,11 +17337,51 @@ var GeoTemConfig = {
 GeoTemConfig.ie = false;
 GeoTemConfig.ie8 = false;
 
+GeoTemConfig.independentMapId = 0;
+GeoTemConfig.independentTimeId = 0;
+
 if (/MSIE (\d+\.\d+);/.test(navigator.userAgent)) {
 	GeoTemConfig.ie = true;
 	var ieversion = new Number(RegExp.$1);
 	if (ieversion == 8) {
 		GeoTemConfig.ie8 = true;
+	}
+}
+
+GeoTemConfig.getIndependentId = function(target){
+	if( target == 'map' ){
+		return ++GeoTemConfig.independentMapId;
+	}
+	if( target == 'time' ){
+		return ++GeoTemConfig.independentTimeId;
+	}
+	return 0;
+};
+
+GeoTemConfig.setHexColor = function(hex,index,fill){
+	var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	if( fill ){
+		GeoTemConfig.colors[index].r0 = parseInt(result[1], 16);
+		GeoTemConfig.colors[index].g0 = parseInt(result[2], 16);
+		GeoTemConfig.colors[index].b0 = parseInt(result[3], 16);
+	}
+	else {
+		GeoTemConfig.colors[index].r1 = parseInt(result[1], 16);
+		GeoTemConfig.colors[index].g1 = parseInt(result[2], 16);
+		GeoTemConfig.colors[index].b1 = parseInt(result[3], 16);
+	}
+}
+
+GeoTemConfig.setRgbColor = function(r,g,b,index,fill){
+	if( fill ){
+		GeoTemConfig.colors[index].r0 = r;
+		GeoTemConfig.colors[index].g0 = g;
+		GeoTemConfig.colors[index].b0 = b;
+	}
+	else {
+		GeoTemConfig.colors[index].r1 = r;
+		GeoTemConfig.colors[index].g1 = g;
+		GeoTemConfig.colors[index].b1 = b;
 	}
 }
 
@@ -18701,8 +18743,7 @@ function MapConfig(options) {
 			maxLon : 44,
 			maxLat : 67
 		}, // initial map boundaries or 'false' for no boundaries
-		mapCanvasFrom : '#9db9d8', // map widget background gradient color top
-		mapCanvasTo : '#5783b5', // map widget background gradient color bottom
+		mapBackground : '#bbd0ed',
 		labelGrid : true, // show label grid on hover
 		maxPlaceLabels : 6, // Integer value for fixed number of place labels: 0 --> unlimited, 1 --> 1 label (won't be shown in popup, 2 --> is not possible because of others & all labels --> 3 labels, [3,...,N] --> [3,...,N] place labels)
 		selectDefault : true, // true, if strongest label should be selected as default
@@ -18717,9 +18758,13 @@ function MapConfig(options) {
 		ieHoveredLabel : "color: COLOR1; font-weight: bold;", // css code for a hovered place label in IE
 		hoveredLabel : "color: COLOR1; font-weight: bold;", // css code for a hovered place label
 		circleGap : 0, // gap between the circles on the map (>=0)
+		circleOverlap : {
+			type: 'area', // 'area' or 'diameter' is possible
+			overlap: 0 // the percentage of allowed overlap (0<=overlap<=1)
+		}, // maximum allowed overlap in percent (if circleGap = 0, circleOverlap will be used)
 		minimumRadius : 4, // minimum radius of a circle with mimimal weight (>0)
-		circleOutline : true, // true if circles should have a default outline
-		circleTransparency : true, // transparency of the circles
+		circleOutline : 2, // false for no outline or a pixel value v with 0 < v
+		circleOpacity : 'balloon', // 'balloon' for dynamic opacity of the circles or a value t with 0 <= t <= 1
 		minTransparency : 0.4, // maximum transparency of a circle
 		maxTransparency : 0.8, // minimum transparency of a circle
 		binning : 'generic', // binning algorithm for the map, possible values are: 'generic', 'square', 'hexagonal', 'triangular' or false for 'no binning'
@@ -18773,7 +18818,7 @@ function MapConfig(options) {
  * @param {HTML object} div parent div to append the map gui
  * @param {JSON} options map configuration
  */
-function MapGui(map, div, options) {
+function MapGui(map, div, options, iid) {
 
 	this.map = map;
 
@@ -18787,11 +18832,14 @@ function MapGui(map, div, options) {
 	this.container.style.position = 'relative';
 
 	this.mapWindow = document.createElement("div");
-	this.mapWindow.id = "mapWindow";
+	this.mapWindow.setAttribute('class', 'mapWindow');
+	this.mapWindow.id = "mapWindow"+iid;
+	this.mapWindow.style.background = options.mapBackground;
 	this.container.appendChild(this.mapWindow);
 
 	this.mapContainer = document.createElement("div");
-	this.mapContainer.id = "mapContainer";
+	this.mapContainer.setAttribute('class', 'mapContainer');
+	this.mapContainer.id = "mapContainer"+iid;
 	this.mapContainer.style.position = "absolute";
 	this.mapContainer.style.zIndex = 0;
 	this.mapWindow.appendChild(this.mapContainer);
@@ -19115,9 +19163,10 @@ function MapWidget(core, div, options) {
 
 	this.div = div;
 
+	this.iid = GeoTemConfig.getIndependentId('map');
 	this.options = (new MapConfig(options)).options;
 	this.formerCP = this.options.circlePackings;
-	this.gui = new MapGui(this, this.div, this.options);
+	this.gui = new MapGui(this, this.div, this.options, this.iid);
 
 	this.initialize();
 
@@ -19231,7 +19280,7 @@ MapWidget.prototype = {
 			units : 'meters',
 			maxExtent : new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34)
 		};
-		this.openlayersMap = new OpenLayers.Map("mapContainer", options);
+		this.openlayersMap = new OpenLayers.Map("mapContainer"+this.iid, options);
 		if (map.options.navigate) {
 			this.activeControl = "navigate";
 		}
@@ -19703,8 +19752,12 @@ MapWidget.prototype = {
 		if (this.options.alternativeMap) {
 			this.addBaseLayers([this.options.alternativeMap]);
 		}
+		this.setBaseLayerByName(this.options.baseLayer);
+	},
+
+	setBaseLayerByName : function(name){
 		for (var i = 0; i < this.baseLayers.length; i++) {
-			if (this.baseLayers[i].name == this.options.baseLayer) {
+			if (this.baseLayers[i].name == name) {
 				this.setMap(i);
 			}
 		}
@@ -19945,18 +19998,24 @@ MapWidget.prototype = {
 				for (var k = 0; k < points[i][j].length; k++) {
 					var point = points[i][j][k];
 					var c = GeoTemConfig.getColor(point.search);
-					var transparency = 1;
-					if (this.options.circleTransparency) {
+					var opacity;
+					if (this.options.circleOpacity == 'balloon') {
 						var min = this.options.minTransparency;
 						var max = this.options.maxTransparency;
-						transparency = min + Math.abs(min - max) * (1 - (getArea(point.radius) - minArea) / areaDiff);
+						opacity = min + Math.abs(min - max) * (1 - (getArea(point.radius) - minArea) / areaDiff);
 					}
-					var col = this.options.circleOutline;
-					//transparency = 0.8;
+					else {
+						opacity = this.options.circleOpacity;
+					}
+					var col = false, ols = 0;
+					if( this.options.circleOutline ){
+						col = true;
+						ols = this.options.circleOutline;
+					}
 					var style = {
 						fillColor : 'rgb(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ')',
-						fillOpacity : transparency,
-						strokeWidth : 2,
+						fillOpacity : opacity,
+						strokeWidth : ols,
 						strokeColor : 'rgb(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ')',
 						stroke : col,
 						pointRadius : point.radius,
@@ -19969,7 +20028,7 @@ MapWidget.prototype = {
 					point.setFeature(feature);
 					var olStyle = {
 						fillColor : 'rgb(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ')',
-						fillOpacity : transparency,
+						fillOpacity : opacity,
 						stroke : false,
 						pointRadius : 0,
 						cursor : "pointer"
@@ -20077,6 +20136,9 @@ MapWidget.prototype = {
 	 * updates the the object layer of the map after selections had been executed in timeplot or table or zoom level has changed
 	 */
 	highlightChanged : function(mapObjects) {
+		if( !GeoTemConfig.highlightEvents ){
+			return;
+		}
 		this.mds.clearOverlay();
 		if (this.selection.valid()) {
 			this.mds.setOverlay(GeoTemConfig.mergeObjects(mapObjects, this.selection.getObjects()));
@@ -20094,6 +20156,9 @@ MapWidget.prototype = {
 	},
 
 	selectionChanged : function(selection) {
+		if( !GeoTemConfig.selectionEvents ){
+			return;
+		}
 		this.reset();
 		this.selection = selection;
 		this.highlightChanged(selection.objects);
@@ -20565,7 +20630,7 @@ function TimeConfig(options) {
  * @param {HTML object} div parent div to append the time gui
  * @param {JSON} options time configuration
  */
-function TimeGui(plot, div, options) {
+function TimeGui(plot, div, options, iid) {
 
 	var gui = this;
 
@@ -20588,7 +20653,8 @@ function TimeGui(plot, div, options) {
 	this.container.appendChild(toolbarTable);
 
 	this.plotWindow = document.createElement("div");
-	this.plotWindow.id = "plotWindow";
+	this.plotWindow.id = "plotWindow"+iid;
+	this.plotWindow.setAttribute('class', 'plotWindow');
 //	this.plotWindow.style.width = w + "px";
 
 	this.plotWindow.style.height = (h + 12) + "px";
@@ -20599,7 +20665,8 @@ function TimeGui(plot, div, options) {
 	}
 
 	this.plotContainer = document.createElement("div");
-	this.plotContainer.id = "plotContainer";
+	this.plotContainer.id = "plotContainer"+iid;
+	this.plotContainer.setAttribute('class', 'plotContainer');
 //	this.plotContainer.style.width = w + "px";
 	this.plotContainer.style.height = h + "px";
 	this.plotContainer.style.position = "absolute";
@@ -20895,8 +20962,9 @@ function TimeWidget(core, div, options) {
 	this.status
 	this.slider
 
+	this.iid = GeoTemConfig.getIndependentId('time');
 	this.options = (new TimeConfig(options)).options;
-	this.gui = new TimeGui(this, div, this.options);
+	this.gui = new TimeGui(this, div, this.options, this.iid);
 	this.initialize();
 
 }
@@ -21868,6 +21936,9 @@ TimeWidget.prototype = {
 	 * updates the timeplot by displaying place poles, after a selection had been executed in another widget
 	 */
 	highlightChanged : function(timeObjects) {
+		if( !GeoTemConfig.highlightEvents ){
+			return;
+		}
 		this.resetOverlay();
 		if (this.selection.valid()) {
 			if (!this.selection.equal(this)) {
@@ -21885,6 +21956,9 @@ TimeWidget.prototype = {
 	 * updates the timeplot by displaying place poles, after a selection had been executed in another widget
 	 */
 	selectionChanged : function(selection) {
+		if( !GeoTemConfig.selectionEvents ){
+			return;
+		}
 		this.reset();
 		this.selection = selection;
 		this.tds.setOverlay(selection.objects);
@@ -22322,7 +22396,6 @@ TableWidget.prototype = {
 	},
 
 	selectTable : function(index) {
-
 		if (this.activeTable != index) {
 			if ( typeof this.activeTable != 'undefined') {
 				this.tables[this.activeTable].hide();
@@ -22338,6 +22411,9 @@ TableWidget.prototype = {
 	},
 
 	highlightChanged : function(objects) {
+		if( !GeoTemConfig.highlightEvents ){
+			return;
+		}
 		if( this.tables.length > 0 ){
 			return;
 		}
@@ -22355,6 +22431,9 @@ TableWidget.prototype = {
 	},
 
 	selectionChanged : function(selection) {
+		if( !GeoTemConfig.selectionEvents ){
+			return;
+		}
 		this.reset();
 		if( this.tables.length == 0 ){
 			return;
@@ -23817,7 +23896,7 @@ Binning.prototype = {
 				selectionMap.push([]);
 			}
 			var resolution = this.map.getResolutionForZoom(this.zoomLevels - i - 1);
-			clustering.mergeForResolution(resolution, this.options.circleGap);
+			clustering.mergeForResolution(resolution, this.options.circleGap, this.options.circleOverlap);
 			for (var j = 0; j < clustering.vertices.length; j++) {
 				var point = clustering.vertices[j];
 				if (!point.legal) {
@@ -25072,11 +25151,11 @@ Clustering.prototype.JordanTest = function(pol, e) {
 	return inside;
 }
 
-Clustering.prototype.mergeForResolution = function(resolution, circleGap) {
+Clustering.prototype.mergeForResolution = function(resolution, circleGap, circleOverlap) {
 	this.deleteEdges = new BinaryHeap(function(e) {
 		return e.weight;
 	});
-	this.weightEdges(resolution, circleGap);
+	this.weightEdges(resolution, circleGap, circleOverlap);
 	var index = 0;
 	while (this.deleteEdges.size() > 0) {
 		var e = this.deleteEdges.pop();
@@ -25087,7 +25166,37 @@ Clustering.prototype.mergeForResolution = function(resolution, circleGap) {
 			for (var k = l; k < this.edges.length; k++) {
 				var eNew = this.edges[k];
 				if (eNew.legal) {
-					eNew.weight = eNew.length / (eNew.v0.radius + eNew.v1.radius + circleGap * resolution );
+					if( circleGap != 0 ){
+						eNew.weight = eNew.length / (eNew.v0.radius + eNew.v1.radius + circleGap * resolution );
+					}
+					else if( circleOverlap.overlap == 0 ){
+						eNew.weight = eNew.length / (eNew.v0.radius + eNew.v1.radius);
+					}
+					else {
+						var r1 = eNew.v0.radius;
+						var r2 = eNew.v1.radius;
+						var r = eNew.length;
+						if( r < r1 + r2 ){
+							if( circleOverlap.type == 'diameter' ){
+								var ol1 = (r2-(r-r1)) / r1 / 2;
+								var ol2 = (r1-(r-r2)) / r2 / 2;
+								var ol = Math.max(ol1,ol2);
+								eNew.weight = circleOverlap.overlap / ol;
+							}
+							if( circleOverlap.type == 'area' ){								
+								if( !(r+r1 < r2 || r+r2 < r1) ){
+									var A = r2*r2*Math.acos((r*r+r2*r2-r1*r1)/(2*r*r2))+r1*r1*Math.acos((r*r+r1*r1-r2*r2)/(2*r*r1))-1/2*Math.sqrt((-r+r1+r2)*(r-r1+r2)*(r+r1-r2)*(r+r1+r2));
+									var ol1 = A / (Math.PI*r1*r1);
+									var ol2 = A / (Math.PI*r2*r2);
+									var ol = Math.max(ol1,ol2);
+									eNew.weight = circleOverlap.overlap / ol;
+								}
+								else {
+									eNew.weight = 0;
+								}
+							}
+						}
+					}
 					if (eNew.weight < 1) {
 						this.deleteEdges.push(eNew);
 					}
@@ -25097,7 +25206,7 @@ Clustering.prototype.mergeForResolution = function(resolution, circleGap) {
 	}
 }
 
-Clustering.prototype.weightEdges = function(resolution, circleGap) {
+Clustering.prototype.weightEdges = function(resolution, circleGap, circleOverlap) {
 	for (var i = 0; i < this.vertices.length; i++) {
 		if (this.vertices[i].legal) {
 			this.vertices[i].CalculateRadius(resolution);
@@ -25110,7 +25219,37 @@ Clustering.prototype.weightEdges = function(resolution, circleGap) {
 			if (!e.v0.legal || !e.v1.legal) {
 				e.weight = 1;
 			} else {
-				e.weight = e.length / (e.v0.radius + e.v1.radius + circleGap * resolution );
+				if( circleGap != 0 ){
+					e.weight = e.length / (e.v0.radius + e.v1.radius + circleGap * resolution );
+				}
+				else if( circleOverlap.overlap == 0 ){
+					e.weight = e.length / (e.v0.radius + e.v1.radius);
+				}
+				else {
+					var r1 = e.v0.radius;
+					var r2 = e.v1.radius;
+					var r = e.length;
+					if( r < r1 + r2 ){
+						if( circleOverlap.type == 'diameter' ){
+							var ol1 = (r2-(r-r1)) / r1 / 2;
+							var ol2 = (r1-(r-r2)) / r2 / 2;
+							var ol = Math.max(ol1,ol2);
+							e.weight = circleOverlap.overlap / ol;
+						}
+						if( circleOverlap.type == 'area' ){
+							if( !(r+r1 < r2 || r+r2 < r1) ){
+								var A = r2*r2*Math.acos((r*r+r2*r2-r1*r1)/(2*r*r2))+r1*r1*Math.acos((r*r+r1*r1-r2*r2)/(2*r*r1))-1/2*Math.sqrt((-r+r1+r2)*(r-r1+r2)*(r+r1-r2)*(r+r1+r2));
+								var ol1 = A / (Math.PI*r1*r1);
+								var ol2 = A / (Math.PI*r2*r2);
+								var ol = Math.max(ol1,ol2);
+								e.weight = circleOverlap.overlap / ol;
+							}
+							else {
+								e.weight = 0;
+							}
+						}
+					}
+				}
 				if (e.weight < 1) {
 					this.deleteEdges.push(e);
 				}
@@ -25299,6 +25438,7 @@ BinaryHeap.prototype = {
 				this.content[n] = parent;
 				// Update 'n' to continue at the new position.
 				n = parentN;
+
 			}
 			// Found a parent that is less, no need to move it further.
 			else {

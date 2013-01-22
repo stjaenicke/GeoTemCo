@@ -31,7 +31,7 @@
  * @param {HTML object} div parent div to append the map gui
  * @param {JSON} options map configuration
  */
-function MapGui(map, div, options) {
+function MapGui(map, div, options, iid) {
 
 	this.map = map;
 
@@ -45,11 +45,14 @@ function MapGui(map, div, options) {
 	this.container.style.position = 'relative';
 
 	this.mapWindow = document.createElement("div");
-	this.mapWindow.id = "mapWindow";
+	this.mapWindow.setAttribute('class', 'mapWindow');
+	this.mapWindow.id = "mapWindow"+iid;
+	this.mapWindow.style.background = options.mapBackground;
 	this.container.appendChild(this.mapWindow);
 
 	this.mapContainer = document.createElement("div");
-	this.mapContainer.id = "mapContainer";
+	this.mapContainer.setAttribute('class', 'mapContainer');
+	this.mapContainer.id = "mapContainer"+iid;
 	this.mapContainer.style.position = "absolute";
 	this.mapContainer.style.zIndex = 0;
 	this.mapWindow.appendChild(this.mapContainer);
