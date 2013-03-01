@@ -108,22 +108,24 @@ TimeWidget.prototype = {
 		var granularity = 0;
 		this.count = 0;
 		for (var i = 0; i < timeObjects.length; i++) {
-			var eventSource = new Timeplot.DefaultEventSource();
-			var dataSource = new Timeplot.ColumnSource(eventSource, 1);
-			this.dataSources.push(dataSource);
-			this.eventSources.push(eventSource);
-			var c = GeoTemConfig.getColor(i);
-			var plotInfo = Timeplot.createPlotInfo({
-				id : "plot" + i,
-				dataSource : dataSource,
-				timeGeometry : this.timeGeometry,
-				valueGeometry : this.valueGeometry,
-				fillGradient : false,
-				lineColor : 'rgba(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ', 1)',
-				fillColor : 'rgba(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ', 0.3)',
-				showValues : true
-			});
-			this.plotInfos.push(plotInfo);
+			if( i==0 || !this.options.timeMerge ){
+				var eventSource = new Timeplot.DefaultEventSource();
+				var dataSource = new Timeplot.ColumnSource(eventSource, 1);
+				this.dataSources.push(dataSource);
+				this.eventSources.push(eventSource);
+				var c = GeoTemConfig.getColor(i);
+				var plotInfo = Timeplot.createPlotInfo({
+					id : "plot" + i,
+					dataSource : dataSource,
+					timeGeometry : this.timeGeometry,
+					valueGeometry : this.valueGeometry,
+					fillGradient : false,
+					lineColor : 'rgba(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ', 1)',
+					fillColor : 'rgba(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ', 0.3)',
+					showValues : true
+				});
+				this.plotInfos.push(plotInfo);
+			}
 			for (var j = 0; j < timeObjects[i].length; j++) {
 				var o = timeObjects[i][j];
 				if (o.isTemporal) {
@@ -988,7 +990,7 @@ TimeWidget.prototype = {
 			if (slices[i].overlay() == 0) {
 				continue;
 			}
-			var stacks = slices[i].stacks;
+			var projStacks = slices[i].projStacks;
 			var time = slices[i].date;
 			var pos;
 			if (this.style == 'graph') {
@@ -1000,15 +1002,15 @@ TimeWidget.prototype = {
 			}
 			var heights = [];
 			var h = 0;
-			for (var j = 0; j < stacks.length; j++) {
+			for (var j = 0; j < projStacks.length; j++) {
 				var data = plots[j]._dataSource.getData();
 				for (var k = 0; k < data.times.length; k++) {
 					if (data.times[k].getTime() == time.getTime()) {
-						var height = plots[j]._valueGeometry.toScreen(plots[j]._dataSource.getData().values[k]) * stacks[j].overlay / stacks[j].value;
+						var height = plots[j]._valueGeometry.toScreen(plots[j]._dataSource.getData().values[k]) * projStacks[j].overlay / projStacks[j].value;
 						heights.push(height);
 						plots[j].pins[i] = {
 							height : height,
-							count : stacks[j].overlay
+							count : projStacks[j].overlay
 						};
 						if (height > h) {
 							h = height;

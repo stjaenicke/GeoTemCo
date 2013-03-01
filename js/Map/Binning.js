@@ -282,7 +282,8 @@ Binning.prototype = {
 					var delta2 = r1 - delta1;
 					createCircle(-delta1, 0, balls[0]);
 					createCircle(delta2 + r2 - 3 * d, r2, balls[1]);
-					createCircle(delta2 + r3 - (3 * d * r3 / r2), -1 * r3, balls[2]);
+					createCircle(delta2 + r2 - 3 * d, -1 * r3, balls[2]);
+//					createCircle(delta2 + r3 - (3 * d * r3 / r2), -1 * r3, balls[2]);
 				} else if (balls.length == 4) {
 					balls.sort(orderBalls);
 					var r1 = balls[0].radius;

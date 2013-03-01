@@ -125,8 +125,10 @@ function PlacenameTags(circle, map) {
 
 	this.calculatePlacenameTags = function() {
 		var cloud = this;
-
 		var c = GeoTemConfig.getColor(this.circle.search);
+		if( map.options.useGraphics ){
+			c = map.config.getGraphic(this.circle.search).color;
+		}
 		var color0 = 'rgb(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ')';
 		var color1 = 'rgb(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ')';
 		var allStyles = "", hoverStyle = "", highlightStyle = "", selectedStyle = "", unselectedStyle = "";
@@ -362,6 +364,9 @@ function PackPlacenameTags(circle, map) {
 
 		for (var k = 0; k < this.placeLabels.length; k++) {
 			var c = GeoTemConfig.getColor(this.circle.circles[k].search);
+			if( map.options.useGraphics ){
+				c = map.config.getGraphic(this.circle.circles[k].search).color;
+			}
 			var color0 = 'rgb(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ')';
 			var color1 = 'rgb(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ')';
 			var allStyles = "", hoverStyle = "", highlightStyle = "", selectedStyle = "", unselectedStyle = "";
@@ -390,6 +395,9 @@ function PackPlacenameTags(circle, map) {
 						var oppositeLabel, oppositeLabelDiv;
 						label.div.setAttribute('style', allStyles + "" + selectedStyles[id]);
 						var c = GeoTemConfig.getColor(id);
+						if( map.options.useGraphics ){
+							c = map.config.getGraphic(id).color;
+						}
 						var color0 = 'rgb(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ')';
 						if (id == 0) {
 							for (var i = 0; i < cloud.droppedLabels[1].length; i++) {

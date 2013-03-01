@@ -494,6 +494,12 @@ div.simileAjax-bubble-close {
     border: 1px solid #FFB02D;
     z-index: 998;
 }
+@import url(http://fonts.googleapis.com/css?family=Droid+Sans:regular,bold&subset=latin);
+
+body {
+	font-family: "Droid Sans", verdana, arial, serif;
+}
+
 /*
   settings for slider object
 */
@@ -1060,7 +1066,7 @@ filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
 
 .osmLink {
 	position: absolute;
-	right: 5px;
+	left: 5px;
 	bottom: 5px;
 	font-size: 11px;
 	color: blue;
@@ -1456,6 +1462,7 @@ filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
     cursor: pointer;
 }
 
+
 .descriptions {	
     display: inline-block;
     height: 20px;
@@ -1463,6 +1470,17 @@ filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
     background-image: url(../images/descriptions.png);
     background-repeat: no-repeat;
     cursor: pointer;
+}
+
+.legend {
+	position: absolute;
+	right: 0px;
+	bottom: 0px;
+	opacity: 0.7;
+	filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+	background-color: #EEE;
+	font-size: 12px;
 }
 
 .mapHome {

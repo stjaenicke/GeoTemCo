@@ -18180,8 +18180,10 @@ function PlacenameTags(circle, map) {
 
 	this.calculatePlacenameTags = function() {
 		var cloud = this;
-
 		var c = GeoTemConfig.getColor(this.circle.search);
+		if( map.options.useGraphics ){
+			c = map.config.getGraphic(this.circle.search).color;
+		}
 		var color0 = 'rgb(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ')';
 		var color1 = 'rgb(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ')';
 		var allStyles = "", hoverStyle = "", highlightStyle = "", selectedStyle = "", unselectedStyle = "";
@@ -18417,6 +18419,9 @@ function PackPlacenameTags(circle, map) {
 
 		for (var k = 0; k < this.placeLabels.length; k++) {
 			var c = GeoTemConfig.getColor(this.circle.circles[k].search);
+			if( map.options.useGraphics ){
+				c = map.config.getGraphic(this.circle.circles[k].search).color;
+			}
 			var color0 = 'rgb(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ')';
 			var color1 = 'rgb(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ')';
 			var allStyles = "", hoverStyle = "", highlightStyle = "", selectedStyle = "", unselectedStyle = "";
@@ -18445,6 +18450,9 @@ function PackPlacenameTags(circle, map) {
 						var oppositeLabel, oppositeLabelDiv;
 						label.div.setAttribute('style', allStyles + "" + selectedStyles[id]);
 						var c = GeoTemConfig.getColor(id);
+						if( map.options.useGraphics ){
+							c = map.config.getGraphic(id).color;
+						}
 						var color0 = 'rgb(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ')';
 						if (id == 0) {
 							for (var i = 0; i < cloud.droppedLabels[1].length; i++) {
@@ -18719,6 +18727,27 @@ function MapConfig(options) {
 		 layer: 'namespace:layerName'
 		 }
 		 */
+		legend : true, // if a legend at the bottom of the map should be shown or not
+		mapMerge : false, // if the elements of distinct datasets should be merged into one set or not
+		useGraphics : false,  // if different graphics should represent different datasets or not
+		graphics : [
+			{
+				shape: "circle",
+				rotation: 0
+			},
+			{
+				shape: "square",
+				rotation: 0
+			},
+			{
+				shape: "triangle",
+				rotation: 0
+			},
+			{
+				shape: "square",
+				rotation: 45
+			}
+		],
 		googleMaps : false, // enable/disable Google maps (actually, no Google Maps API key is required)
 		bingMaps : false, // enable/disable Bing maps (you need to set the Bing Maps API key below)
 		bingApiKey : 'none', // bing maps api key, see informations at http://bingmapsportal.com/
@@ -18765,7 +18794,7 @@ function MapConfig(options) {
 		minimumRadius : 4, // minimum radius of a circle with mimimal weight (>0)
 		circleOutline : 2, // false for no outline or a pixel value v with 0 < v
 		circleOpacity : 'balloon', // 'balloon' for dynamic opacity of the circles or a value t with 0 <= t <= 1
-		minTransparency : 0.4, // maximum transparency of a circle
+		minTransparency : 0.55, // maximum transparency of a circle
 		maxTransparency : 0.8, // minimum transparency of a circle
 		binning : 'generic', // binning algorithm for the map, possible values are: 'generic', 'square', 'hexagonal', 'triangular' or false for 'no binning'
 		noBinningRadii : 'dynamic', // for 'no binning': 'static' for only minimum radii, 'dynamic' for increasing radii for increasing weights
@@ -18784,6 +18813,15 @@ function MapConfig(options) {
 		$.extend(this.options, options);
 	}
 
+};
+
+MapConfig.prototype.getGraphic = function(id){
+	var graphic = this.options.graphics[id % this.options.graphics.length];
+	return {
+		shape: graphic.shape,
+		rotation: graphic.rotation,
+		color: GeoTemConfig.getColor(Math.floor(id/this.options.graphics.length))
+	};
 };
 /*
 * MapGui.js
@@ -18960,6 +18998,19 @@ function MapGui(map, div, options, iid) {
 		}
 	}
 
+	if (options.legend) {
+		this.legendDiv = document.createElement("div");
+		this.legendDiv.setAttribute('class', 'legend');
+		this.mapWindow.appendChild(this.legendDiv);
+	}
+
+	var linkForOsm = 'http://www.openstreetmap.org/';
+	var linkForLicense = 'http://creativecommons.org/licenses/by-sa/2.0/';
+	this.osmLink = document.createElement("div");
+	this.osmLink.setAttribute('class', 'osmLink');
+	this.osmLink.innerHTML = '(c) <a href=' + linkForOsm + '>OpenStreetMap contributors</a>, <a href=' + linkForLicense + '>CC-BY-SA</a>';
+	this.mapWindow.appendChild(this.osmLink);
+
 	//		var tooltip = document.createElement("div");
 	//		tooltip.setAttribute('class','ddbTooltip');
 	//		toolbarTable.appendChild(tooltip);
@@ -19022,6 +19073,39 @@ function MapGui(map, div, options, iid) {
 		}
 		this.headerHeight = toolbarTable.offsetHeight;
 		this.headerWidth = toolbarTable.offsetWidth;
+	};
+
+	this.updateLegend = function(datasets){
+		$(this.legendDiv).empty();
+		var table = $('<table style="margin:10px"/>').appendTo(this.legendDiv);
+		for( var i=0; i<datasets.length; i++ ){
+			var row = $('<tr/>').appendTo(table);
+			if( options.useGraphics ){
+				var graphic = map.config.getGraphic(i);
+				var fill = 'rgb(' + graphic.color.r0 + ',' + graphic.color.g0 + ',' + graphic.color.b0 + ')';
+				var stroke = 'rgb(' + graphic.color.r1 + ',' + graphic.color.g1 + ',' + graphic.color.b1 + ')';
+				var rot = graphic.rotation;
+				var svg;
+				if( graphic.shape == 'circle' ){
+					svg = '<svg style="width:20px;height:20px;"><circle cx="10" cy="10" r="7" stroke="'+stroke+'" stroke-width="2" fill="'+fill+'"/></svg>';
+				}
+				else if( graphic.shape == 'square' ){
+					svg = '<svg style="width:20px;height:20px;"><polygon points="4,4 16,4 16,16 4,16" style="fill:'+fill+';stroke:'+stroke+';stroke-width:2" transform="rotate('+rot+' 10,10)"/></svg>';
+				}
+				else if( graphic.shape == 'triangle' ){
+					svg = '<svg style="width:20px;height:20px;"><polygon points="3,17 17,17 10,5" style="fill:'+fill+';stroke:'+stroke+';stroke-width:2" transform="rotate('+rot+' 10,10)"/></svg>';
+				}
+				$('<td>'+svg+'</td>').appendTo(row);
+			}
+			else {
+				var c = GeoTemConfig.getColor(i);
+				var fill = 'rgb(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ')';
+				var stroke = 'rgb(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ')';
+				var svg = '<svg style="width:20px;height:20px;"><circle cx="10" cy="10" r="7" stroke="'+stroke+'" stroke-width="2" fill="'+fill+'"/></svg>';
+				$('<td>'+svg+'</td>').appendTo(row);
+			}			
+			$('<td>'+datasets[i].label+'</td>').appendTo(row);
+		}
 	};
 
 	this.updateSpaceQuantity = function(count) {
@@ -19164,7 +19248,8 @@ function MapWidget(core, div, options) {
 	this.div = div;
 
 	this.iid = GeoTemConfig.getIndependentId('map');
-	this.options = (new MapConfig(options)).options;
+	this.config = new MapConfig(options);
+	this.options = this.config.options;
 	this.formerCP = this.options.circlePackings;
 	this.gui = new MapGui(this, this.div, this.options, this.iid);
 
@@ -19222,13 +19307,6 @@ MapWidget.prototype = {
 		 }
 		 map.addEditingMode(new OpenLayers.Control.EditingMode.PointArraySnapping());
 		 */
-
-		var linkForOsm = 'http://www.openstreetmap.org/';
-		var linkForLicense = 'http://creativecommons.org/licenses/by-sa/2.0/';
-		this.osmLink = document.createElement("div");
-		this.osmLink.setAttribute('class', 'osmLink');
-		this.osmLink.innerHTML = '(c) <a href=' + linkForOsm + '>OpenStreetMap contributors</a>, <a href=' + linkForLicense + '>CC-BY-SA</a>';
-		this.gui.mapWindow.appendChild(this.osmLink);
 
 		this.filterBar = new FilterBar(this, this.gui.filterOptions);
 
@@ -19997,7 +20075,21 @@ MapWidget.prototype = {
 			for (var j = 0; j < points[i].length; j++) {
 				for (var k = 0; k < points[i][j].length; k++) {
 					var point = points[i][j][k];
-					var c = GeoTemConfig.getColor(point.search);
+					var c, shape, rotation, multiplier = 1;
+					if( this.options.useGraphics ){
+						var graphic = this.config.getGraphic(point.search);
+						c = graphic.color;
+						shape = graphic.shape;
+						rotation = graphic.rotation;
+						if( shape == 'square' ){
+							multiplier = 0.75;
+						}
+					}
+					else {
+						c = GeoTemConfig.getColor(point.search);
+						shape = 'circle';
+						rotation = 0;
+					}
 					var opacity;
 					if (this.options.circleOpacity == 'balloon') {
 						var min = this.options.minTransparency;
@@ -20013,12 +20105,14 @@ MapWidget.prototype = {
 						ols = this.options.circleOutline;
 					}
 					var style = {
+						graphicName: shape,
+						rotation: rotation,
 						fillColor : 'rgb(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ')',
 						fillOpacity : opacity,
 						strokeWidth : ols,
 						strokeColor : 'rgb(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ')',
 						stroke : col,
-						pointRadius : point.radius,
+						pointRadius : point.radius * multiplier,
 						cursor : "pointer"
 					};
 					var pointGeometry = new OpenLayers.Geometry.Point(point.originX, point.originY, null);
@@ -20027,6 +20121,8 @@ MapWidget.prototype = {
 					feature.parent = point;
 					point.setFeature(feature);
 					var olStyle = {
+						graphicName: shape,
+						rotation: rotation,
 						fillColor : 'rgb(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ')',
 						fillOpacity : opacity,
 						stroke : false,
@@ -20065,6 +20161,8 @@ MapWidget.prototype = {
 		 }
 		 }
 		 */
+
+		this.gui.updateLegend(datasets);
 
 		if ( typeof zoom == "undefined") {
 			this.drawObjectLayer(true);
@@ -20124,6 +20222,12 @@ MapWidget.prototype = {
 	 */
 	updatePoint : function(point, polygon) {
 		var olRadius = this.mds.binning.getRadius(point.overlay);
+		if( this.options.useGraphics ){
+			var graphic = this.config.getGraphic(point.search);
+			if( graphic.shape == 'square' ){
+				olRadius *= 0.75;
+			}
+		}		
 		if (olRadius != point.olFeature.style.pointRadius) {
 			point.olFeature.style.pointRadius = olRadius;
 			if (polygon.containsPoint(point.feature.geometry)) {
@@ -20403,9 +20507,9 @@ MapWidget.prototype = {
 		this.openlayersMap.zoomTo(Math.floor(this.openlayersMap.getZoom()));
 		this.openlayersMap.setBaseLayer(this.baseLayers[index]);
 		if (this.baseLayers[index].name == 'Open Street Map') {
-			this.osmLink.style.visibility = 'visible';
+			this.gui.osmLink.style.visibility = 'visible';
 		} else {
-			this.osmLink.style.visibility = 'hidden';
+			this.gui.osmLink.style.visibility = 'hidden';
 		}
 	},
 
@@ -20590,7 +20694,8 @@ function TimeConfig(options) {
 		scaleSelection : true, // show/hide scale selection buttons
 		linearScale : true, // true for linear value scaling, false for logarithmic
 		unitSelection : true, // show/hide time unit selection dropdown
-		timeUnit : -1 // minimum temporal unit (SimileAjax.DateTime or -1 if none) of the data
+		timeUnit : -1, // minimum temporal unit (SimileAjax.DateTime or -1 if none) of the data
+		timeMerge : false // if the elements of distinct datasets should be merged into one set or not
 	};
 	if ( typeof options != 'undefined') {
 		$.extend(this.options, options);
@@ -21006,22 +21111,24 @@ TimeWidget.prototype = {
 		var granularity = 0;
 		this.count = 0;
 		for (var i = 0; i < timeObjects.length; i++) {
-			var eventSource = new Timeplot.DefaultEventSource();
-			var dataSource = new Timeplot.ColumnSource(eventSource, 1);
-			this.dataSources.push(dataSource);
-			this.eventSources.push(eventSource);
-			var c = GeoTemConfig.getColor(i);
-			var plotInfo = Timeplot.createPlotInfo({
-				id : "plot" + i,
-				dataSource : dataSource,
-				timeGeometry : this.timeGeometry,
-				valueGeometry : this.valueGeometry,
-				fillGradient : false,
-				lineColor : 'rgba(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ', 1)',
-				fillColor : 'rgba(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ', 0.3)',
-				showValues : true
-			});
-			this.plotInfos.push(plotInfo);
+			if( i==0 || !this.options.timeMerge ){
+				var eventSource = new Timeplot.DefaultEventSource();
+				var dataSource = new Timeplot.ColumnSource(eventSource, 1);
+				this.dataSources.push(dataSource);
+				this.eventSources.push(eventSource);
+				var c = GeoTemConfig.getColor(i);
+				var plotInfo = Timeplot.createPlotInfo({
+					id : "plot" + i,
+					dataSource : dataSource,
+					timeGeometry : this.timeGeometry,
+					valueGeometry : this.valueGeometry,
+					fillGradient : false,
+					lineColor : 'rgba(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ', 1)',
+					fillColor : 'rgba(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ', 0.3)',
+					showValues : true
+				});
+				this.plotInfos.push(plotInfo);
+			}
 			for (var j = 0; j < timeObjects[i].length; j++) {
 				var o = timeObjects[i][j];
 				if (o.isTemporal) {
@@ -21886,7 +21993,7 @@ TimeWidget.prototype = {
 			if (slices[i].overlay() == 0) {
 				continue;
 			}
-			var stacks = slices[i].stacks;
+			var projStacks = slices[i].projStacks;
 			var time = slices[i].date;
 			var pos;
 			if (this.style == 'graph') {
@@ -21898,15 +22005,15 @@ TimeWidget.prototype = {
 			}
 			var heights = [];
 			var h = 0;
-			for (var j = 0; j < stacks.length; j++) {
+			for (var j = 0; j < projStacks.length; j++) {
 				var data = plots[j]._dataSource.getData();
 				for (var k = 0; k < data.times.length; k++) {
 					if (data.times[k].getTime() == time.getTime()) {
-						var height = plots[j]._valueGeometry.toScreen(plots[j]._dataSource.getData().values[k]) * stacks[j].overlay / stacks[j].value;
+						var height = plots[j]._valueGeometry.toScreen(plots[j]._dataSource.getData().values[k]) * projStacks[j].overlay / projStacks[j].value;
 						heights.push(height);
 						plots[j].pins[i] = {
 							height : height,
-							count : stacks[j].overlay
+							count : projStacks[j].overlay
 						};
 						if (height > h) {
 							h = height;
@@ -23367,9 +23474,11 @@ TimeDataSource.prototype = {
 		this.minDate = undefined;
 		this.maxDate = undefined;
 		this.hashMapping = [];
+		this.projHashMapping = [];
 
 		for (var i = 0; i < timeObjects.length; i++) {
 			this.hashMapping.push([]);
+			this.projHashMapping.push([]);
 			for (var j = 0; j < timeObjects[i].length; j++) {
 				var o = timeObjects[i][j];
 				if (o.isTemporal) {
@@ -23414,12 +23523,16 @@ TimeDataSource.prototype = {
 		var t = new Date(this.minDate.getTime() - 0.9 * time.gregorianUnitLengths[this.unit]);
 		do {
 			time.roundDownToInterval(t, this.unit, undefined, 1, 0);
-			var slice = new TimeSlice(SimileAjax.NativeDateUnit.cloneValue(t), this.timeObjects.length);
+			var slice = new TimeSlice(SimileAjax.NativeDateUnit.cloneValue(t), this.timeObjects.length, this.dataSources.length);
 			this.timeSlices.push(slice);
 			time.incrementByInterval(t, this.unit, undefined);
 		} while (t.getTime() <= this.maxDate.getTime() + 1.1 * time.gregorianUnitLengths[this.unit]);
 
 		for (var i = 0; i < this.timeObjects.length; i++) {
+			var projId = i;
+			if( this.dataSources.length == 1 ){
+				projId = 0;
+			}
 			for (var j = 0; j < this.timeObjects[i].length; j++) {
 				var o = this.timeObjects[i][j];
 				if (o.isTemporal) {
@@ -23428,16 +23541,20 @@ TimeDataSource.prototype = {
 					for (var k = 0; k < this.timeSlices.length - 1; k++) {
 						var t1 = this.timeSlices[k].date.getTime();
 						var t2 = this.timeSlices[k + 1].date.getTime();
-						var stack = null;
+						var stack = null, projStack = null;
 						if (date >= t1 && date < t2) {
 							stack = this.timeSlices[k].getStack(i);
+							projStack = this.timeSlices[k].getProjStack(projId);
 						}
 						if (k == this.timeSlices.length - 2 && date >= t2) {
 							stack = this.timeSlices[k + 1].getStack(i);
+							projStack = this.timeSlices[k + 1].getProjStack(projId);
 						}
 						if (stack != null) {
 							stack.addObject(o);
+							projStack.addObject(o);
 							this.hashMapping[i][o.index] = stack;
+							this.projHashMapping[i][o.index] = projStack;
 							break;
 						}
 					}
@@ -23449,7 +23566,7 @@ TimeDataSource.prototype = {
 		for (var i = 0; i < this.eventSources.length; i++) {
 			var eventSet = [];
 			for (var j = 0; j < this.timeSlices.length; j++) {
-				var value = new Array("" + this.timeSlices[j].stacks[i].value);
+				var value = new Array("" + this.timeSlices[j].projStacks[i].value);
 				eventSet.push({
 					date : this.timeSlices[j].date,
 					value : value
@@ -23611,6 +23728,7 @@ TimeDataSource.prototype = {
 						continue;
 					}
 					this.hashMapping[j][o.index].overlay += o.weight;
+					this.projHashMapping[j][o.index].overlay += o.weight;
 				}
 			}
 		}
@@ -23628,31 +23746,40 @@ TimeDataSource.prototype = {
  * small class that represents a time slice of the actual timeplot.
  * it has a specific date and contains its corrsponding data objects as well
  */
-function TimeSlice(date, rows) {
+function TimeSlice(date, rows, projRows) {
 
 	this.date = date;
 	this.selected = false;
 
 	this.stacks = [];
+	this.projStacks = [];
 	for (var i = 0; i < rows; i++) {
 		this.stacks.push(new TimeStack());
+	}
+	for (var i = 0; i < projRows; i++) {
+		this.projStacks.push(new TimeStack());
 	}
 
 	this.getStack = function(row) {
 		return this.stacks[row];
 	};
 
+	this.getProjStack = function(row) {
+		return this.projStacks[row];
+	};
+
 	this.reset = function() {
-		for (var i in this.stacks ) {
+		for (var i in this.projStacks ) {
 			this.stacks[i].overlay = 0;
+			this.projStacks[i].overlay = 0;
 		}
 	};
 
 	this.overlay = function() {
 		var value = 0;
-		for (var i in this.stacks ) {
-			if (this.stacks[i].overlay > value) {
-				value = this.stacks[i].overlay;
+		for (var i in this.projStacks ) {
+			if (this.projStacks[i].overlay > value) {
+				value = this.projStacks[i].overlay;
 			}
 		}
 		return value;
@@ -23960,7 +24087,8 @@ Binning.prototype = {
 					var delta2 = r1 - delta1;
 					createCircle(-delta1, 0, balls[0]);
 					createCircle(delta2 + r2 - 3 * d, r2, balls[1]);
-					createCircle(delta2 + r3 - (3 * d * r3 / r2), -1 * r3, balls[2]);
+					createCircle(delta2 + r2 - 3 * d, -1 * r3, balls[2]);
+//					createCircle(delta2 + r3 - (3 * d * r3 / r2), -1 * r3, balls[2]);
 				} else if (balls.length == 4) {
 					balls.sort(orderBalls);
 					var r1 = balls[0].radius;
@@ -26173,7 +26301,7 @@ function WidgetWrapper() {
 		}
 	});
 
-	Publisher.Subscribe('filter', this, function(data) {
+	Publisher.Subscribe('filterData', this, function(data) {
 		wrapper.display(data);
 	});
 
@@ -26190,7 +26318,7 @@ function WidgetWrapper() {
 	});
 
 	this.triggerRefining = function(datasets) {
-		Publisher.Publish('filter', datasets, null);
+		Publisher.Publish('filterData', datasets, null);
 	};
 
 	this.triggerSelection = function(selectedObjects) {

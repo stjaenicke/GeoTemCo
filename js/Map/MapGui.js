@@ -173,6 +173,19 @@ function MapGui(map, div, options, iid) {
 		}
 	}
 
+	if (options.legend) {
+		this.legendDiv = document.createElement("div");
+		this.legendDiv.setAttribute('class', 'legend');
+		this.mapWindow.appendChild(this.legendDiv);
+	}
+
+	var linkForOsm = 'http://www.openstreetmap.org/';
+	var linkForLicense = 'http://creativecommons.org/licenses/by-sa/2.0/';
+	this.osmLink = document.createElement("div");
+	this.osmLink.setAttribute('class', 'osmLink');
+	this.osmLink.innerHTML = '(c) <a href=' + linkForOsm + '>OpenStreetMap contributors</a>, <a href=' + linkForLicense + '>CC-BY-SA</a>';
+	this.mapWindow.appendChild(this.osmLink);
+
 	//		var tooltip = document.createElement("div");
 	//		tooltip.setAttribute('class','ddbTooltip');
 	//		toolbarTable.appendChild(tooltip);
@@ -235,6 +248,39 @@ function MapGui(map, div, options, iid) {
 		}
 		this.headerHeight = toolbarTable.offsetHeight;
 		this.headerWidth = toolbarTable.offsetWidth;
+	};
+
+	this.updateLegend = function(datasets){
+		$(this.legendDiv).empty();
+		var table = $('<table style="margin:10px"/>').appendTo(this.legendDiv);
+		for( var i=0; i<datasets.length; i++ ){
+			var row = $('<tr/>').appendTo(table);
+			if( options.useGraphics ){
+				var graphic = map.config.getGraphic(i);
+				var fill = 'rgb(' + graphic.color.r0 + ',' + graphic.color.g0 + ',' + graphic.color.b0 + ')';
+				var stroke = 'rgb(' + graphic.color.r1 + ',' + graphic.color.g1 + ',' + graphic.color.b1 + ')';
+				var rot = graphic.rotation;
+				var svg;
+				if( graphic.shape == 'circle' ){
+					svg = '<svg style="width:20px;height:20px;"><circle cx="10" cy="10" r="7" stroke="'+stroke+'" stroke-width="2" fill="'+fill+'"/></svg>';
+				}
+				else if( graphic.shape == 'square' ){
+					svg = '<svg style="width:20px;height:20px;"><polygon points="4,4 16,4 16,16 4,16" style="fill:'+fill+';stroke:'+stroke+';stroke-width:2" transform="rotate('+rot+' 10,10)"/></svg>';
+				}
+				else if( graphic.shape == 'triangle' ){
+					svg = '<svg style="width:20px;height:20px;"><polygon points="3,17 17,17 10,5" style="fill:'+fill+';stroke:'+stroke+';stroke-width:2" transform="rotate('+rot+' 10,10)"/></svg>';
+				}
+				$('<td>'+svg+'</td>').appendTo(row);
+			}
+			else {
+				var c = GeoTemConfig.getColor(i);
+				var fill = 'rgb(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ')';
+				var stroke = 'rgb(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ')';
+				var svg = '<svg style="width:20px;height:20px;"><circle cx="10" cy="10" r="7" stroke="'+stroke+'" stroke-width="2" fill="'+fill+'"/></svg>';
+				$('<td>'+svg+'</td>').appendTo(row);
+			}			
+			$('<td>'+datasets[i].label+'</td>').appendTo(row);
+		}
 	};
 
 	this.updateSpaceQuantity = function(count) {

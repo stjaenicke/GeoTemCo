@@ -112,9 +112,11 @@ TimeDataSource.prototype = {
 		this.minDate = undefined;
 		this.maxDate = undefined;
 		this.hashMapping = [];
+		this.projHashMapping = [];
 
 		for (var i = 0; i < timeObjects.length; i++) {
 			this.hashMapping.push([]);
+			this.projHashMapping.push([]);
 			for (var j = 0; j < timeObjects[i].length; j++) {
 				var o = timeObjects[i][j];
 				if (o.isTemporal) {
@@ -159,12 +161,16 @@ TimeDataSource.prototype = {
 		var t = new Date(this.minDate.getTime() - 0.9 * time.gregorianUnitLengths[this.unit]);
 		do {
 			time.roundDownToInterval(t, this.unit, undefined, 1, 0);
-			var slice = new TimeSlice(SimileAjax.NativeDateUnit.cloneValue(t), this.timeObjects.length);
+			var slice = new TimeSlice(SimileAjax.NativeDateUnit.cloneValue(t), this.timeObjects.length, this.dataSources.length);
 			this.timeSlices.push(slice);
 			time.incrementByInterval(t, this.unit, undefined);
 		} while (t.getTime() <= this.maxDate.getTime() + 1.1 * time.gregorianUnitLengths[this.unit]);
 
 		for (var i = 0; i < this.timeObjects.length; i++) {
+			var projId = i;
+			if( this.dataSources.length == 1 ){
+				projId = 0;
+			}
 			for (var j = 0; j < this.timeObjects[i].length; j++) {
 				var o = this.timeObjects[i][j];
 				if (o.isTemporal) {
@@ -173,16 +179,20 @@ TimeDataSource.prototype = {
 					for (var k = 0; k < this.timeSlices.length - 1; k++) {
 						var t1 = this.timeSlices[k].date.getTime();
 						var t2 = this.timeSlices[k + 1].date.getTime();
-						var stack = null;
+						var stack = null, projStack = null;
 						if (date >= t1 && date < t2) {
 							stack = this.timeSlices[k].getStack(i);
+							projStack = this.timeSlices[k].getProjStack(projId);
 						}
 						if (k == this.timeSlices.length - 2 && date >= t2) {
 							stack = this.timeSlices[k + 1].getStack(i);
+							projStack = this.timeSlices[k + 1].getProjStack(projId);
 						}
 						if (stack != null) {
 							stack.addObject(o);
+							projStack.addObject(o);
 							this.hashMapping[i][o.index] = stack;
+							this.projHashMapping[i][o.index] = projStack;
 							break;
 						}
 					}
@@ -194,7 +204,7 @@ TimeDataSource.prototype = {
 		for (var i = 0; i < this.eventSources.length; i++) {
 			var eventSet = [];
 			for (var j = 0; j < this.timeSlices.length; j++) {
-				var value = new Array("" + this.timeSlices[j].stacks[i].value);
+				var value = new Array("" + this.timeSlices[j].projStacks[i].value);
 				eventSet.push({
 					date : this.timeSlices[j].date,
 					value : value
@@ -356,6 +366,7 @@ TimeDataSource.prototype = {
 						continue;
 					}
 					this.hashMapping[j][o.index].overlay += o.weight;
+					this.projHashMapping[j][o.index].overlay += o.weight;
 				}
 			}
 		}
@@ -373,31 +384,40 @@ TimeDataSource.prototype = {
  * small class that represents a time slice of the actual timeplot.
  * it has a specific date and contains its corrsponding data objects as well
  */
-function TimeSlice(date, rows) {
+function TimeSlice(date, rows, projRows) {
 
 	this.date = date;
 	this.selected = false;
 
 	this.stacks = [];
+	this.projStacks = [];
 	for (var i = 0; i < rows; i++) {
 		this.stacks.push(new TimeStack());
+	}
+	for (var i = 0; i < projRows; i++) {
+		this.projStacks.push(new TimeStack());
 	}
 
 	this.getStack = function(row) {
 		return this.stacks[row];
 	};
 
+	this.getProjStack = function(row) {
+		return this.projStacks[row];
+	};
+
 	this.reset = function() {
-		for (var i in this.stacks ) {
+		for (var i in this.projStacks ) {
 			this.stacks[i].overlay = 0;
+			this.projStacks[i].overlay = 0;
 		}
 	};
 
 	this.overlay = function() {
 		var value = 0;
-		for (var i in this.stacks ) {
-			if (this.stacks[i].overlay > value) {
-				value = this.stacks[i].overlay;
+		for (var i in this.projStacks ) {
+			if (this.projStacks[i].overlay > value) {
+				value = this.projStacks[i].overlay;
 			}
 		}
 		return value;

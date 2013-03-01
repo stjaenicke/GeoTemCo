@@ -45,7 +45,8 @@ function TimeConfig(options) {
 		scaleSelection : true, // show/hide scale selection buttons
 		linearScale : true, // true for linear value scaling, false for logarithmic
 		unitSelection : true, // show/hide time unit selection dropdown
-		timeUnit : -1 // minimum temporal unit (SimileAjax.DateTime or -1 if none) of the data
+		timeUnit : -1, // minimum temporal unit (SimileAjax.DateTime or -1 if none) of the data
+		timeMerge : false // if the elements of distinct datasets should be merged into one set or not
 	};
 	if ( typeof options != 'undefined') {
 		$.extend(this.options, options);

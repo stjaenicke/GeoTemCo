@@ -49,7 +49,8 @@ function MapWidget(core, div, options) {
 	this.div = div;
 
 	this.iid = GeoTemConfig.getIndependentId('map');
-	this.options = (new MapConfig(options)).options;
+	this.config = new MapConfig(options);
+	this.options = this.config.options;
 	this.formerCP = this.options.circlePackings;
 	this.gui = new MapGui(this, this.div, this.options, this.iid);
 
@@ -107,13 +108,6 @@ MapWidget.prototype = {
 		 }
 		 map.addEditingMode(new OpenLayers.Control.EditingMode.PointArraySnapping());
 		 */
-
-		var linkForOsm = 'http://www.openstreetmap.org/';
-		var linkForLicense = 'http://creativecommons.org/licenses/by-sa/2.0/';
-		this.osmLink = document.createElement("div");
-		this.osmLink.setAttribute('class', 'osmLink');
-		this.osmLink.innerHTML = '(c) <a href=' + linkForOsm + '>OpenStreetMap contributors</a>, <a href=' + linkForLicense + '>CC-BY-SA</a>';
-		this.gui.mapWindow.appendChild(this.osmLink);
 
 		this.filterBar = new FilterBar(this, this.gui.filterOptions);
 
@@ -882,7 +876,21 @@ MapWidget.prototype = {
 			for (var j = 0; j < points[i].length; j++) {
 				for (var k = 0; k < points[i][j].length; k++) {
 					var point = points[i][j][k];
-					var c = GeoTemConfig.getColor(point.search);
+					var c, shape, rotation, multiplier = 1;
+					if( this.options.useGraphics ){
+						var graphic = this.config.getGraphic(point.search);
+						c = graphic.color;
+						shape = graphic.shape;
+						rotation = graphic.rotation;
+						if( shape == 'square' ){
+							multiplier = 0.75;
+						}
+					}
+					else {
+						c = GeoTemConfig.getColor(point.search);
+						shape = 'circle';
+						rotation = 0;
+					}
 					var opacity;
 					if (this.options.circleOpacity == 'balloon') {
 						var min = this.options.minTransparency;
@@ -898,12 +906,14 @@ MapWidget.prototype = {
 						ols = this.options.circleOutline;
 					}
 					var style = {
+						graphicName: shape,
+						rotation: rotation,
 						fillColor : 'rgb(' + c.r0 + ',' + c.g0 + ',' + c.b0 + ')',
 						fillOpacity : opacity,
 						strokeWidth : ols,
 						strokeColor : 'rgb(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ')',
 						stroke : col,
-						pointRadius : point.radius,
+						pointRadius : point.radius * multiplier,
 						cursor : "pointer"
 					};
 					var pointGeometry = new OpenLayers.Geometry.Point(point.originX, point.originY, null);
@@ -912,6 +922,8 @@ MapWidget.prototype = {
 					feature.parent = point;
 					point.setFeature(feature);
 					var olStyle = {
+						graphicName: shape,
+						rotation: rotation,
 						fillColor : 'rgb(' + c.r1 + ',' + c.g1 + ',' + c.b1 + ')',
 						fillOpacity : opacity,
 						stroke : false,
@@ -950,6 +962,8 @@ MapWidget.prototype = {
 		 }
 		 }
 		 */
+
+		this.gui.updateLegend(datasets);
 
 		if ( typeof zoom == "undefined") {
 			this.drawObjectLayer(true);
@@ -1009,6 +1023,12 @@ MapWidget.prototype = {
 	 */
 	updatePoint : function(point, polygon) {
 		var olRadius = this.mds.binning.getRadius(point.overlay);
+		if( this.options.useGraphics ){
+			var graphic = this.config.getGraphic(point.search);
+			if( graphic.shape == 'square' ){
+				olRadius *= 0.75;
+			}
+		}		
 		if (olRadius != point.olFeature.style.pointRadius) {
 			point.olFeature.style.pointRadius = olRadius;
 			if (polygon.containsPoint(point.feature.geometry)) {
@@ -1288,9 +1308,9 @@ MapWidget.prototype = {
 		this.openlayersMap.zoomTo(Math.floor(this.openlayersMap.getZoom()));
 		this.openlayersMap.setBaseLayer(this.baseLayers[index]);
 		if (this.baseLayers[index].name == 'Open Street Map') {
-			this.osmLink.style.visibility = 'visible';
+			this.gui.osmLink.style.visibility = 'visible';
 		} else {
-			this.osmLink.style.visibility = 'hidden';
+			this.gui.osmLink.style.visibility = 'hidden';
 		}
 	},
 

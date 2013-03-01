@@ -42,6 +42,27 @@ function MapConfig(options) {
 		 layer: 'namespace:layerName'
 		 }
 		 */
+		legend : true, // if a legend at the bottom of the map should be shown or not
+		mapMerge : false, // if the elements of distinct datasets should be merged into one set or not
+		useGraphics : false,  // if different graphics should represent different datasets or not
+		graphics : [
+			{
+				shape: "circle",
+				rotation: 0
+			},
+			{
+				shape: "square",
+				rotation: 0
+			},
+			{
+				shape: "triangle",
+				rotation: 0
+			},
+			{
+				shape: "square",
+				rotation: 45
+			}
+		],
 		googleMaps : false, // enable/disable Google maps (actually, no Google Maps API key is required)
 		bingMaps : false, // enable/disable Bing maps (you need to set the Bing Maps API key below)
 		bingApiKey : 'none', // bing maps api key, see informations at http://bingmapsportal.com/
@@ -88,7 +109,7 @@ function MapConfig(options) {
 		minimumRadius : 4, // minimum radius of a circle with mimimal weight (>0)
 		circleOutline : 2, // false for no outline or a pixel value v with 0 < v
 		circleOpacity : 'balloon', // 'balloon' for dynamic opacity of the circles or a value t with 0 <= t <= 1
-		minTransparency : 0.4, // maximum transparency of a circle
+		minTransparency : 0.55, // maximum transparency of a circle
 		maxTransparency : 0.8, // minimum transparency of a circle
 		binning : 'generic', // binning algorithm for the map, possible values are: 'generic', 'square', 'hexagonal', 'triangular' or false for 'no binning'
 		noBinningRadii : 'dynamic', // for 'no binning': 'static' for only minimum radii, 'dynamic' for increasing radii for increasing weights
@@ -107,4 +128,13 @@ function MapConfig(options) {
 		$.extend(this.options, options);
 	}
 
+};
+
+MapConfig.prototype.getGraphic = function(id){
+	var graphic = this.options.graphics[id % this.options.graphics.length];
+	return {
+		shape: graphic.shape,
+		rotation: graphic.rotation,
+		color: GeoTemConfig.getColor(Math.floor(id/this.options.graphics.length))
+	};
 };
