@@ -49,6 +49,7 @@ function TableWidget(core, div, options) {
 TableWidget.prototype = {
 
 	initWidget : function(data) {
+		this.datasets = data;
 
 		$(this.gui.tabs).empty();
 		$(this.gui.input).empty();
