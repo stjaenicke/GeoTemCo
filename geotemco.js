@@ -17207,7 +17207,7 @@ var Tooltips = {
 		"triangularBinning" : "Dreiecke",
 		"noBinning" : "Keine Bins",
 		"selectBinningType" : "W&auml;hle Binningart",
-		"binningTooltip" : "W&aunl;hle die Binninart f�r die Datenquellen",
+		"binningTooltip" : "W&aunl;hle die Binninart f&uuml;r die Datenquellen",
 		"binningType" : "Binningart",
 		"results" : "Resultate",
 		"result" : "Resultat",
@@ -17254,7 +17254,7 @@ var Tooltips = {
 		"sortAZHelp" : "Sort table elements ascending according this column",
 		"sortZAHelp" : "Sort table elements descending according this column",
 		"paginationDropdownHelp" : "Select number of elements per page",
-		"selectTimeUnit" : "W�hle Zeitinervalle",
+		"selectTimeUnit" : "W&auml;hle Zeitinervalle",
 		"valueScale" : "Value Scale",
 		"linearPlot" : "Linear Value Scale",
 		"logarithmicPlot" : "Logarithmic Value Scale",
@@ -19073,6 +19073,8 @@ function MapGui(map, div, options, iid) {
 		}
 		this.headerHeight = toolbarTable.offsetHeight;
 		this.headerWidth = toolbarTable.offsetWidth;
+		this.map.openlayersMap.updateSize();
+		this.map.drawObjectLayer(true);
 	};
 
 	this.updateLegend = function(datasets){
@@ -19482,7 +19484,6 @@ MapWidget.prototype = {
 			this.openlayersMap.addControl(new OpenLayers.Control.ScaleLine());
 		}
 		this.gui.resize();
-		this.openlayersMap.updateSize();
 		this.setBaseLayers();
 		this.gui.setMapsDropdown();
 		this.gui.setMap();
@@ -19582,7 +19583,8 @@ MapWidget.prototype = {
 			this.drawSquare = new OpenLayers.Control.DrawFeature(map.objectLayer, OpenLayers.Handler.RegularPolygon, {
 				displayClass : "olControlDrawFeaturePolygon",
 				handlerOptions : {
-					sides : 4
+					sides : 4,
+	                                irregular: true
 				},
 				callbacks : {
 					"done" : map.drawnPolygonHandler,
@@ -22452,6 +22454,7 @@ function TableWidget(core, div, options) {
 TableWidget.prototype = {
 
 	initWidget : function(data) {
+		this.datasets = data;
 
 		$(this.gui.tabs).empty();
 		$(this.gui.input).empty();
@@ -26200,7 +26203,7 @@ if ( typeof Publisher == 'undefined') {
 
 		this.Get = function(topic) {
 			var value = topics[topic];
-			if (!value) {
+			if (!value || !(value instanceof Array)) {
 				value = topics[topic] = [];
 			}
 			return value;

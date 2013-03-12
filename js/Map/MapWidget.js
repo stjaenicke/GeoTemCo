@@ -283,7 +283,6 @@ MapWidget.prototype = {
 			this.openlayersMap.addControl(new OpenLayers.Control.ScaleLine());
 		}
 		this.gui.resize();
-		this.openlayersMap.updateSize();
 		this.setBaseLayers();
 		this.gui.setMapsDropdown();
 		this.gui.setMap();
@@ -383,7 +382,8 @@ MapWidget.prototype = {
 			this.drawSquare = new OpenLayers.Control.DrawFeature(map.objectLayer, OpenLayers.Handler.RegularPolygon, {
 				displayClass : "olControlDrawFeaturePolygon",
 				handlerOptions : {
-					sides : 4
+					sides : 4,
+	                                irregular: true
 				},
 				callbacks : {
 					"done" : map.drawnPolygonHandler,
