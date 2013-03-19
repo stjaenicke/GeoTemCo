@@ -20009,8 +20009,10 @@ MapWidget.prototype = {
 		}
 		this.zIndices[id] = this.layerZIndex;
 		this.layerZIndex += 2;
-		this.reset();
 		this.drawObjectLayer(false);
+		for( var i=0; i<this.polygons.length; i++ ){
+			this.objectLayer.addFeatures([this.polygons[i]]);
+		}
 	},
 
 	/**
@@ -22606,7 +22608,10 @@ TableWidget.prototype = {
 	},
 
 	filtering : function() {
-		this.core.triggerRefining(this.selection.objects);
+		for (var i = 0; i < this.datasets.length; i++) {
+			this.datasets[i].objects = this.selection.objects[i];
+		}
+		this.core.triggerRefining(this.datasets);
 	},
 
 	inverseFiltering : function() {

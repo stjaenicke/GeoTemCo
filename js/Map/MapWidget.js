@@ -808,8 +808,10 @@ MapWidget.prototype = {
 		}
 		this.zIndices[id] = this.layerZIndex;
 		this.layerZIndex += 2;
-		this.reset();
 		this.drawObjectLayer(false);
+		for( var i=0; i<this.polygons.length; i++ ){
+			this.objectLayer.addFeatures([this.polygons[i]]);
+		}
 	},
 
 	/**
