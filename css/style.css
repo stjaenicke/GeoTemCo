@@ -107,10 +107,6 @@ body {
 	overflow: visible;
 }
 
-.timeplot-copyright {
-    visibility: hidden;
-}
-
 .timeplot-timeflag {
     font-size: 0.8em;
     font-weight: normal;
@@ -965,6 +961,7 @@ filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
     display: inline-block;
     cursor: pointer;
 }
+
 
 
 .descriptions {	
