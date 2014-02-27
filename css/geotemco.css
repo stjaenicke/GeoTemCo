@@ -496,10 +496,6 @@ div.simileAjax-bubble-close {
 }
 @import url(http://fonts.googleapis.com/css?family=Droid+Sans:regular,bold&subset=latin);
 
-body {
-	font-family: "Droid Sans", verdana, arial, serif;
-}
-
 /*
   settings for slider object
 */
@@ -1207,7 +1203,6 @@ filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
 }
 
 .ddbElementsCount {
-	font-family: Calibri,Arial,sans-serif;
 	color: white;
 	font-style: italic;
 	font-weight: normal;
@@ -1803,7 +1798,6 @@ filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
 }
 
 .resultList th {
-	font-family: Calibri,Arial,sans-serif;
 	color: white;
 	font-size: 13px;
 	font-weight: bold;
@@ -1811,7 +1805,6 @@ filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
 }
 
 .resultList td {
-	font-family: Calibri,Arial,sans-serif;
 	font-size: 13px;
 	padding: 10px;
 	border-bottom: 1px solid #878380;

@@ -27,7 +27,12 @@
 		var mapDiv = document.getElementById("mapContainerDiv");
 		var map = new WidgetWrapper();
 		var mapWidget = new MapWidget(map,mapDiv,{
-			mapTitle: "Publication Place"
+			mapTitle: "Publication Place",
+			alternativeMap : {
+			 name: '1715',
+			 url: '/geoserver/wms',
+			 layer: 'historic:cntry1715'
+			 }
 		});
 		var timeDiv = document.getElementById("plotContainerDiv");
 		var time = new WidgetWrapper();
