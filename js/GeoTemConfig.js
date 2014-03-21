@@ -367,7 +367,7 @@ GeoTemConfig.loadJson = function(JSON) {
 					dates.push(time);
 				}
 			}
-			var weight = item.weight || 1;
+			var weight = parseInt(item.weight) || 1;
 			var mapTimeObject = new DataObject(name, description, locations, dates, weight, tableContent);
 			mapTimeObject.setIndex(index);
 			mapTimeObjects.push(mapTimeObject);
