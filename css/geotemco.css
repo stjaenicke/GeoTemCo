@@ -1334,6 +1334,18 @@ filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
 	cursor: pointer;
 }
 
+.zoomIn {
+	width: 19px;
+	height: 16px;
+	background-image: url("../images/zoom_in.png");
+}
+
+.zoomOut {
+	width: 19px;
+	height: 16px;
+	background-image: url("../images/zoom_out.png");
+}
+
 .ddbPopupDiv {
 	position: absolute;
 	background-color: white;

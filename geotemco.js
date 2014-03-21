@@ -17582,6 +17582,18 @@ GeoTemConfig.loadJson = function(JSON) {
 					if ((lon == "" || lat == "" || isNaN(lon) || isNaN(lat) ) && !GeoTemConfig.incompleteData) {
 						throw "e";
 					}
+					if( lon == 180 ){
+						lon = 179.999;
+					}
+					if( lon == -180 ){
+						lon = -179.999;
+					}
+					if( lat == 90 ){
+						lon = 89.999;
+					}
+					if( lat == -90 ){
+						lat = -89.999;
+					}
 					locations.push({
 						longitude : lon,
 						latitude : lat,
@@ -17676,6 +17688,18 @@ GeoTemConfig.loadKml = function(kml) {
 			if (lon == "" || lat == "" || isNaN(lon) || isNaN(lat)) {
 				throw "e";
 			}
+					if( lon == 180 ){
+						lon = 179.999;
+					}
+					if( lon == -180 ){
+						lon = -179.999;
+					}
+					if( lat == 90 ){
+						lon = 89.999;
+					}
+					if( lat == -90 ){
+						lat = -89.999;
+					}
 			location.push({
 				longitude : lon,
 				latitude : lat,
@@ -25790,17 +25814,15 @@ function MapZoomSlider(parent, orientation) {
 	this.slider = new Slider(sliderDiv, sliderInputDiv, orientation);
 	this.div.appendChild(sliderContainer);
 
-	var zoomIn = document.createElement("img");
-	zoomIn.src = GeoTemConfig.path + "zoom_in.png";
-	zoomIn.setAttribute('class', 'zoomSliderIn-' + orientation);
+	var zoomIn = document.createElement("div");
+	zoomIn.setAttribute('class', 'zoomIn zoomSliderIn-' + orientation);
 	zoomIn.onclick = function() {
 		zs.parent.zoom(1);
 	}
 	this.div.appendChild(zoomIn);
 
-	var zoomOut = document.createElement("img");
-	zoomOut.src = GeoTemConfig.path + "zoom_out.png";
-	zoomOut.setAttribute('class', 'zoomSliderOut-' + orientation);
+	var zoomOut = document.createElement("div");
+	zoomOut.setAttribute('class', 'zoomOut zoomSliderOut-' + orientation);
 	zoomOut.onclick = function() {
 		zs.parent.zoom(-1);
 	}

@@ -45,17 +45,15 @@ function MapZoomSlider(parent, orientation) {
 	this.slider = new Slider(sliderDiv, sliderInputDiv, orientation);
 	this.div.appendChild(sliderContainer);
 
-	var zoomIn = document.createElement("img");
-	zoomIn.src = GeoTemConfig.path + "zoom_in.png";
-	zoomIn.setAttribute('class', 'zoomSliderIn-' + orientation);
+	var zoomIn = document.createElement("div");
+	zoomIn.setAttribute('class', 'zoomIn zoomSliderIn-' + orientation);
 	zoomIn.onclick = function() {
 		zs.parent.zoom(1);
 	}
 	this.div.appendChild(zoomIn);
 
-	var zoomOut = document.createElement("img");
-	zoomOut.src = GeoTemConfig.path + "zoom_out.png";
-	zoomOut.setAttribute('class', 'zoomSliderOut-' + orientation);
+	var zoomOut = document.createElement("div");
+	zoomOut.setAttribute('class', 'zoomOut zoomSliderOut-' + orientation);
 	zoomOut.onclick = function() {
 		zs.parent.zoom(-1);
 	}

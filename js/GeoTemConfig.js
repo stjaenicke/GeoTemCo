@@ -318,6 +318,18 @@ GeoTemConfig.loadJson = function(JSON) {
 					if ((lon == "" || lat == "" || isNaN(lon) || isNaN(lat) ) && !GeoTemConfig.incompleteData) {
 						throw "e";
 					}
+					if( lon == 180 ){
+						lon = 179.999;
+					}
+					if( lon == -180 ){
+						lon = -179.999;
+					}
+					if( lat == 90 ){
+						lon = 89.999;
+					}
+					if( lat == -90 ){
+						lat = -89.999;
+					}
 					locations.push({
 						longitude : lon,
 						latitude : lat,
@@ -412,6 +424,18 @@ GeoTemConfig.loadKml = function(kml) {
 			if (lon == "" || lat == "" || isNaN(lon) || isNaN(lat)) {
 				throw "e";
 			}
+					if( lon == 180 ){
+						lon = 179.999;
+					}
+					if( lon == -180 ){
+						lon = -179.999;
+					}
+					if( lat == 90 ){
+						lon = 89.999;
+					}
+					if( lat == -90 ){
+						lat = -89.999;
+					}
 			location.push({
 				longitude : lon,
 				latitude : lat,
